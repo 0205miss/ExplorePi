@@ -4,6 +4,7 @@ import Claimant from "./claimant";
 import { translate } from "translate-config";
 import LockTime from "./locktime";
 import { Roboto_Mono } from "next/font/google";
+import FutureUnlock from './future';
 export const revalidate =  86400
 
 
@@ -48,6 +49,14 @@ export default async function StatisticPage({params:{lang}}){
         data.x = new Date(data.x).getTime()
     })
     dataobj.createclaimant.map(data=>{
+        data.x = new Date(data.x).getTime()
+    })
+    dataobj.futureUnlock.map(data=>{
+        data.amount = parseFloat(data.amount)
+        data.x = new Date(data.x).getTime()
+    })
+    dataobj.futureUnlockMonth.map(data=>{
+        data.amount = parseFloat(data.amount)
         data.x = new Date(data.x).getTime()
     })
     const update = new Date(dataobj.timestamp)
@@ -132,6 +141,9 @@ export default async function StatisticPage({params:{lang}}){
 
             <div className="w-full">
                 <Claimant data={dataobj} transcript={transcript.statistic.Migrate}/>
+            </div>
+            <div className="w-full">
+                <FutureUnlock data={dataobj} transcript={transcript.statistic.Migrate}/>
             </div>
             <div className="w-full">
                 <LockTime data={dataobj} transcript={transcript.statistic.LockUP}/>
