@@ -115,7 +115,7 @@ export default async function StatisticPage({params:{lang}}){
                                 {transcript.statistic.Metrics.PiLocked}
                                 </td>
                                 <td className=" px-3 py-2 text-xs">
-                                    {Number.parseFloat(dataobj.metric.TotalLock).toLocaleString("en-US",{maximumFractionDigits:7})} Pi
+                                    {(parseFloat(dataobj.metric.TotalLock)-parseFloat(dataobj.unlocknotclaimed)).toLocaleString("en-US",{maximumFractionDigits:7})} Pi
                                 </td>
                             </tr>
                             <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
