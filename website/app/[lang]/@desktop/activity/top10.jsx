@@ -220,10 +220,6 @@ export default function Top10({ data, lang, transcript }) {
           </div>
         </AccordionItem>
       </Accordion>
-
-      <div className="text-transparent mb-2 bg-border bg-border-size bg-no-repeat bg-left-bottom text">
-        end block
-      </div>
     </>
   );
 }

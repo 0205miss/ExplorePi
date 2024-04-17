@@ -206,7 +206,7 @@ export default function Claimant({data,transcript}){
     },[data,range])
     return(
         <>
-        <div className="text-center mb-2 font-bold text-lg bg-border bg-border-size bg-no-repeat bg-left-bottom ">
+        <div className="text-center my-2 font-bold text-lg bg-border bg-border-size bg-no-repeat bg-left-bottom ">
             {transcript.title}
         </div>
         <div className="flex items-center justify-center mb-3">
@@ -218,9 +218,6 @@ export default function Claimant({data,transcript}){
         </div>
         <div className="h-48">
         {datas && <Bar options={option} data={datas} />}
-        </div>        
-        <div className="text-transparent mb-2 bg-border bg-border-size bg-no-repeat bg-left-bottom text">
-        end block
         </div>
         </>
     )

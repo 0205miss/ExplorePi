@@ -13,23 +13,27 @@ import {
   Input,
 } from "@nextui-org/react";
 import { SearchIcon } from "./icon/search";
+import { usePathname } from 'next/navigation'
 
-export default function NavbarMobile() {
+export default function NavbarMobile({lang}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const pathname = usePathname()
   const menuItems = [
-    "Profile",
-    "Dashboard",
+    "Block",
+    "Transaction",
+    "Operation",
+    "Network",
+    "Migration",
     "Activity",
-    "Analytics",
-    "System",
-    "Deployments",
-    "My Settings",
-    "Team Settings",
-    "Help & Feedback",
-    "Log Out",
   ];
-
+  const menupath =[
+    'block',
+    'tx',
+    'op',
+    'network',
+    'statistic',
+    'activity'
+  ]
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen} isBlurred={false} className="md:hidden">
       <NavbarContent>
@@ -41,7 +45,7 @@ export default function NavbarMobile() {
       <NavbarContent as="div" className="items-center" justify="end">
         <Input
           
-          placeholder="Type to search..."
+          placeholder="Block/TX/Account"
           size="sm"
           startContent={<SearchIcon size={18} />}
           type="search"
@@ -52,14 +56,12 @@ export default function NavbarMobile() {
           <NavbarMenuItem key={`${item}-${index}`}>
             <Link
               color={
-                index === 2
+                pathname.includes(menupath[index])
                   ? "primary"
-                  : index === menuItems.length - 1
-                  ? "danger"
                   : "foreground"
               }
               className="w-full"
-              href="#"
+              href={`/${lang}/${menupath[index]}`}
               size="lg"
             >
               {item}

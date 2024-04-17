@@ -11,15 +11,15 @@ export default function Searchbar({lang}){
       //check input
       if(Input.match(/^G[A-Za-z0-9]{55}/)){
           //public_key
-          router.push(`./${lang}/account/`+Input)
+          router.push(`/${lang}/account/`+Input)
           setInput('')
       }
       else if(Input.toLowerCase().match(/[a-z0-9]{64}/)){
-          router.push(`./${lang}/tx/`+Input)
+          router.push(`/${lang}/tx/`+Input)
           setInput('')
       }
       else if(Input.match(/^\d+$/)){
-          router.push(`./${lang}/block/`+Input)
+          router.push(`/${lang}/block/`+Input)
           setInput('')
       }else{
           //pop warning message

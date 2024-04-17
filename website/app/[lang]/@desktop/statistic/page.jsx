@@ -109,6 +109,22 @@ export default async function StatisticPage({params:{lang}}){
                                     {Number.parseFloat(dataobj.metric.TotalLock).toLocaleString("en-US",{maximumFractionDigits:7})} Pi
                                 </td>
                             </tr>
+                            <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
+                                <td className="  py-2 font-medium">
+                                UnLock
+                                </td>
+                                <td className=" px-3 py-2 text-xs">
+                                    {Number.parseFloat(dataobj.unlocknotclaimed).toLocaleString("en-US",{maximumFractionDigits:7})} Pi
+                                </td>
+                            </tr>
+                            <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
+                                <td className="  py-2 font-medium">
+                                MayLostPi
+                                </td>
+                                <td className=" px-3 py-2 text-xs">
+                                    {Number.parseFloat(dataobj.oneyearunclaimed).toLocaleString("en-US",{maximumFractionDigits:7})} Pi
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

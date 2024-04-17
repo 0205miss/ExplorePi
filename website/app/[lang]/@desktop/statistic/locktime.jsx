@@ -58,7 +58,7 @@ export default function LockTime({data,transcript}){
     if(!tidydata) return
     return(
         <>
-        <div className="text-center mb-2 font-bold text-lg bg-border bg-border-size bg-no-repeat bg-left-bottom ">
+        <div className="text-center my-2 font-bold text-lg bg-border bg-border-size bg-no-repeat bg-left-bottom ">
             {transcript.title}
         </div>
         <div className="h-40">
