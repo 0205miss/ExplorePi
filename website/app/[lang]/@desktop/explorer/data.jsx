@@ -25,6 +25,7 @@ export default function BlockChainData({ data,transcript }) {
           <TableColumn>ROLE</TableColumn>
         </TableHeader>
         <TableBody>
+          24H LEDGER STATISTICS
           <TableRow key="1">
             <TableCell>{transcript.Metrics.TotalAccount}</TableCell>
             <TableCell>{Number.parseInt(data.metric.TotalAccount).toLocaleString("en-US")}</TableCell>
@@ -38,17 +39,33 @@ export default function BlockChainData({ data,transcript }) {
             <TableCell>{Number.parseFloat(data.metric.TotalPi).toLocaleString("en-US",{maximumFractionDigits:7})} Pi</TableCell>
           </TableRow>
           <TableRow key="4">
-            <TableCell>AvG. Ledger Time</TableCell>
-            <TableCell>{data.pay}</TableCell>
+            <TableCell>AvG. Block Time</TableCell>
+            <TableCell>{parseFloat(data.daily['block_time']).toString()+'s'}</TableCell>
           </TableRow>
           <TableRow key="5">
             <TableCell>TPS</TableCell>
-            <TableCell>{data.payamount}</TableCell>
+            <TableCell>{parseFloat(data.daily.tps)/86400}</TableCell>
           </TableRow>
           <TableRow key="6">
-            <TableCell>Total Account</TableCell>
+            <TableCell>OPS</TableCell>
+            <TableCell>{parseFloat(data.daily.ops)/86400}</TableCell>
+          </TableRow>
+          <TableRow key="7">
+            <TableCell>Block</TableCell>
             <TableCell>
-              {parseFloat((parseFloat(data.payamount) / data.pay).toFixed(7))}
+              {data.daily.total_block}
+            </TableCell>
+          </TableRow>
+          <TableRow key="8">
+            <TableCell>Transactions</TableCell>
+            <TableCell>
+            {data.daily.tps}
+            </TableCell>
+          </TableRow>
+          <TableRow key="9">
+            <TableCell>Operations</TableCell>
+            <TableCell>
+            {data.daily.ops}
             </TableCell>
           </TableRow>
         </TableBody>

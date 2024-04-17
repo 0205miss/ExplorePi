@@ -82,20 +82,26 @@ async function getmetric(){
     docRef.update({'metric':result[0]})
 }
 async function getdailymetric(){
-    let active = await pool.query(`select count(a.account) as dailyactive from(SELECT account FROM explorepi.operation where created_at > now() - interval 24 hour group by account) as a`)
+    let active = await pool.query(`select count(a.account) as dailyactive from(SELECT account FROM explorepi.operation where created_at >= now() - interval 24 hour group by account) as a`)
     active = await JSON.parse(JSON.stringify(active))
-    let fee = await pool.query(`SELECT sum(amount) as a FROM explorepi.fee where created_at > now() - interval 24 hour`)
+    let fee = await pool.query(`SELECT sum(amount) as a FROM explorepi.fee where created_at >= now() - interval 24 hour`)
     fee = await JSON.parse(JSON.stringify(fee))
-    let pay = await pool.query(`SELECT count(*) as dailypayment,sum(amount) as dailypipay FROM explorepi.operation where created_at > now() - interval 24 hour and type_i=1`)
+    let pay = await pool.query(`SELECT count(*) as dailypayment,sum(amount) as dailypipay FROM explorepi.operation where created_at >= now() - interval 24 hour and type_i=1`)
     pay = await JSON.parse(JSON.stringify(pay))
-    let op = await pool.query(`SELECT count(*) as a FROM explorepi.operation where created_at > now() - interval 24 hour`)
+    let op = await pool.query(`SELECT count(*) as a FROM explorepi.operation where created_at >= now() - interval 24 hour`)
     op = await JSON.parse(JSON.stringify(op))
+    let avg_time = await pool.query(`SELECT avg(spend) as a,sum(success) as b,sum(operation) as c,count(id) as d FROM explorepi.block where created_at >= now() - interval 24 hour`)
+    avg_time = await JSON.parse(JSON.stringify(avg_time))
     let result ={
         active:active[0].dailyactive,
         fee:fee[0].a,
         pay:pay[0].dailypayment,
         payamount:pay[0].dailypipay,
-        op:op[0].a
+        op:op[0].a,
+        block_time:avg_time[0].a,
+        tps:avg_time[0].b,
+        ops:avg_time[0].c,
+        total_block:avg_time[0].d,
     }
     docRef.update({'daily':result})
 }
