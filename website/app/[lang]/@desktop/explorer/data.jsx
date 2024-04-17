@@ -44,11 +44,11 @@ export default function BlockChainData({ data,transcript }) {
           </TableRow>
           <TableRow key="5">
             <TableCell>TPS</TableCell>
-            <TableCell>{parseFloat(data.daily.tps)/86400}</TableCell>
+            <TableCell>{parseFloat((parseFloat(data.daily.tps)/86400).toFixed(1))}</TableCell>
           </TableRow>
           <TableRow key="6">
             <TableCell>OPS</TableCell>
-            <TableCell>{parseFloat(data.daily.ops)/86400}</TableCell>
+            <TableCell>{parseFloat((parseFloat(data.daily.ops)/86400).toFixed(1))}</TableCell>
           </TableRow>
           <TableRow key="7">
             <TableCell>Block</TableCell>
