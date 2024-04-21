@@ -24,19 +24,11 @@ import { Line } from "react-chartjs-2"
         type: 'linear',
         display: true,
         position: 'left',
-      },
-      y1: {
-        type: 'linear',
-        display: true,
-        position: 'right',
-        grid: {
-          drawOnChartArea: false,
-        },
-      },
+      }
     },
   };
 
-export default function Block({data,transcript}){
+export default function TotalActive({data,transcript}){
     if(!data) return
     const [filter,setfilter] = useState([])
     const [range,setrange] = useState('all')
@@ -44,11 +36,11 @@ export default function Block({data,transcript}){
     useEffect(()=>{
       if(!range) return
       if(range==='all')
-      setfilter(data.blocktimeMonth)
+      setfilter(data.accountMonth)
       else if(range==='m')
-      setfilter(data.blocktime.slice(-31))
+      setfilter(data.account.slice(0,31))
       else if(range==='y')
-      setfilter(data.blocktimeMonth.slice(-12))
+      setfilter(data.accountMonth.slice(-12))
     },[data,range])
 
     useEffect(()=>{
@@ -57,21 +49,12 @@ export default function Block({data,transcript}){
             {
                 datasets: [
                   {
-                    label: transcript.closed,
+                    label: 'Account',
                     data: filter,
-                    borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgb(244, 190, 95)',
+                    backgroundColor: 'rgba(244, 190, 95, 0.5)',
                     yAxisID: 'y',
-                  },
-                  {
-                    label: transcript.op,
-                    data: filter,
-                    borderColor: 'rgb(53, 162, 235)',
-                    backgroundColor: 'rgba(53, 162, 235, 0.5)',
-                    yAxisID: 'y1',
-                    parsing: {
-                        yAxisKey: 'op'
-                      }
+                    spanGaps: true
                   },
                 ],
               }
@@ -81,7 +64,7 @@ export default function Block({data,transcript}){
     return(
         <>
         <div className="text-center mb-2 font-bold text-lg bg-border bg-border-size bg-no-repeat bg-left-bottom ">
-            {transcript.title}
+            Active Account
         </div>
         <div className="flex items-center justify-center mb-3">
             <div className="inline-flex shadow-md hover:shadow-lg focus:shadow-lg" role="group">

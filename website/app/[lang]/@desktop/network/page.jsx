@@ -3,6 +3,9 @@ import admin from "lib/database";
 import Block from "./block"
 import { translate } from "translate-config";
 import { Roboto_Mono } from "next/font/google";
+import Transaction from './tx';
+import TotalBlock from './totalblock';
+import TotalOperation from './op';
 export const revalidate =  86400
 
 
@@ -20,6 +23,8 @@ export default async function StatisticPage({params:{lang}}){
     const db = admin.firestore();
     const data = await db.collection('statistic').doc('data').get()
     let dataobj = data.data()
+    const net_data = await db.collection('statistic').doc('network').get()
+    let net_dataobj = net_data.data()
     /*block data*/
     dataobj.blocktime.map(data=>{
         if(data.y>10)
@@ -63,6 +68,9 @@ export default async function StatisticPage({params:{lang}}){
 
             <div className="w-full">
                 <Block data={dataobj} transcript={transcript.statistic.Block}/>
+                <TotalBlock data={net_dataobj} transcript={transcript.statistic.Block}/>
+                <TotalOperation data={net_dataobj} transcript={transcript.statistic.Block}/>
+                <Transaction data={net_dataobj} transcript={transcript.statistic.Block}/>            
             </div>
 
         </div>        

@@ -36,7 +36,7 @@ import { Line } from "react-chartjs-2"
     },
   };
 
-export default function Block({data,transcript}){
+export default function Transaction({data,transcript}){
     if(!data) return
     const [filter,setfilter] = useState([])
     const [range,setrange] = useState('all')
@@ -44,11 +44,11 @@ export default function Block({data,transcript}){
     useEffect(()=>{
       if(!range) return
       if(range==='all')
-      setfilter(data.blocktimeMonth)
+      setfilter(data.blockMonth)
       else if(range==='m')
-      setfilter(data.blocktime.slice(-31))
+      setfilter(data.block.slice(-31))
       else if(range==='y')
-      setfilter(data.blocktimeMonth.slice(-12))
+      setfilter(data.blockMonth.slice(-12))
     },[data,range])
 
     useEffect(()=>{
@@ -57,20 +57,25 @@ export default function Block({data,transcript}){
             {
                 datasets: [
                   {
-                    label: transcript.closed,
+                    fill: true,
+                    label: 'Success',
                     data: filter,
-                    borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgb(0,255,127)',
+                    backgroundColor: 'rgba(0,255,127, 0.5)',
                     yAxisID: 'y',
+                    parsing: {
+                        yAxisKey: 'tx'
+                      }
                   },
                   {
-                    label: transcript.op,
+                    fill: true,
+                    label: 'Failed',
                     data: filter,
-                    borderColor: 'rgb(53, 162, 235)',
-                    backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 0.5)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
                     yAxisID: 'y1',
                     parsing: {
-                        yAxisKey: 'op'
+                        yAxisKey: 'tx_fail'
                       }
                   },
                 ],
@@ -81,7 +86,7 @@ export default function Block({data,transcript}){
     return(
         <>
         <div className="text-center mb-2 font-bold text-lg bg-border bg-border-size bg-no-repeat bg-left-bottom ">
-            {transcript.title}
+            Transaction
         </div>
         <div className="flex items-center justify-center mb-3">
             <div className="inline-flex shadow-md hover:shadow-lg focus:shadow-lg" role="group">

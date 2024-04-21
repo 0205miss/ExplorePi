@@ -4,6 +4,7 @@ import { translate } from "translate-config";
 import Top10 from './top10';
 import DailyTable from './daily';
 import RankTable from './rank';
+import TotalActive from './active';
 export const revalidate =  86400
 
 
@@ -16,7 +17,8 @@ export default async function StatisticPage({params:{lang}}){
     const db = admin.firestore();
     const data = await db.collection('statistic').doc('data').get()
     let dataobj = data.data()
-
+    const activedata = await db.collection('statistic').doc('active').get()
+    let activedataobj = activedata.data()
     const update = new Date(dataobj.timestamp)
     return(
         <>
@@ -27,6 +29,7 @@ export default async function StatisticPage({params:{lang}}){
             <DailyTable data={dataobj.daily}/>
             <Top10 data={dataobj} lang={lang} transcript={transcript.statistic.TOP10}/>
             <RankTable data={dataobj.rank}/>
+            <TotalActive data={activedataobj} transcript={transcript.statistic.Block}/>
         </div>        
         </>
     )
