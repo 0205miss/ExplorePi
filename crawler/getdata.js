@@ -7,7 +7,8 @@ const readline = require('node:readline');
 const { stdin: input, stdout: output } = require('node:process');
 
 const docRef = db.collection('statistic').doc('data');
-
+const netRef = db.collection('statistic').doc('network');
+const activeRef = db.collection('statistic').doc('active');
 async function getTop10(){
     let result = await pool.query(`SELECT account,(balance-totalfee.total) as balance FROM explorepi.Account 
     INNER JOIN (SELECT sum(amount) as total,account FROM explorepi.fee group by account order by total desc) as totalfee ON  Account.public_key = totalfee.account
@@ -17,7 +18,7 @@ async function getTop10(){
     docRef.update({'top10':result})
 }
 async function getblocktime(){
-    let result = await pool.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,avg(spend) as y,sum(operation) as op FROM explorepi.block group by DATE_FORMAT(created_at, '%Y-%m-%d') order by x asc;`)
+    let result = await pool.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,avg(spend) as y,sum(operation) as op FROM explorepi.block where created_at >= now() - interval 31 day group by DATE_FORMAT(created_at, '%Y-%m-%d') order by x asc;`)
     result = await JSON.parse(JSON.stringify(result))
     docRef.update({'blocktime':result})
 }
@@ -41,17 +42,17 @@ async function getopdistribute(){
     docRef.update({'opdistribute':result})
 }
 async function getclaimed(){
-    let result = await pool.query(`SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=1 group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`)
+    let result = await pool.query(`SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=1 and created_at >= now() - interval 31 day group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`)
     result = await JSON.parse(JSON.stringify(result))
     docRef.update({'claimed':result})
 }
 async function getclaimedback(){
-    let result = await pool.query(`SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=2 group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`)
+    let result = await pool.query(`SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=2 and created_at >= now() - interval 31 day group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`)
     result = await JSON.parse(JSON.stringify(result))
     docRef.update({'claimedback':result})
 }
 async function getclaimanthistory(){
-    let result = await pool.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant group by DATE_FORMAT(created_at, '%Y-%m-%d') order by x asc;`)
+    let result = await pool.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where created_at >= now() - interval 31 day group by DATE_FORMAT(created_at, '%Y-%m-%d') order by x asc;`)
     result = await JSON.parse(JSON.stringify(result))
     docRef.update({'createclaimant':result})
 }
@@ -135,7 +136,26 @@ async function getholderrank(){
     result = await JSON.parse(JSON.stringify(result))
     docRef.update({'rank':result})
 }
-
+async function getactive(){
+    let result = await pool.query(`SELECT b.x,count(b.y) as y FROM (SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,count(account) as y FROM explorepi.operation where created_at >= now() - interval 31 day group by DATE_FORMAT(created_at, '%Y-%m-%d'),account order by x desc) as b group by b.x ;`)
+    result = await JSON.parse(JSON.stringify(result))
+    activeRef.update({'account':result})
+}
+async function getactiveMonth(){
+    let result = await pool.query(`SELECT b.x,count(b.y) as y FROM (SELECT DATE_FORMAT(created_at, '%Y-%m') as x,count(account) as y FROM explorepi.operation group by DATE_FORMAT(created_at, '%Y-%m'),account) as b group by b.x ;`)
+    result = await JSON.parse(JSON.stringify(result))
+    docRef.update({'accountMonth':result})
+}
+async function getblock(){
+    let result = await pool.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,count(id) as y,sum(success) as tx,sum(operation) as op,sum(fail) as tx_fail FROM explorepi.block where created_at >= now() - interval 31 day group by DATE_FORMAT(created_at, '%Y-%m-%d');`)
+    result = await JSON.parse(JSON.stringify(result))
+    netRef.update({'block':result})
+}
+async function getblockMonth(){
+    let result = await pool.query(`SELECT DATE_FORMAT(created_at, '%Y-%m') as x,count(id) as y,sum(success) as tx,sum(operation) as op,sum(fail) as tx_fail FROM explorepi.block group by DATE_FORMAT(created_at, '%Y-%m');`)
+    result = await JSON.parse(JSON.stringify(result))
+    netRef.update({'blockMonth':result})
+}
 async function statistic(){
     await getTop10()
     await getblocktime() 
@@ -158,6 +178,10 @@ async function statistic(){
     await getfutureunlockMonth()
     await getoneyearunclaimed()
     await getholderrank()
+    await getactive()
+    await getactiveMonth()
+    await getblock()
+    await getblockMonth()
     docRef.update({
         timestamp: Date.now()
         });
