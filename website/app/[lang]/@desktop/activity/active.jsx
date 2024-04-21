@@ -2,45 +2,127 @@
 import { useEffect, useState } from "react"
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-luxon';
-import { Line } from "react-chartjs-2"
-
-  export const options = {
-    maintainAspectRatio : false,
-    interaction: {
-      mode: 'index',
-      intersect: false,
-    },
-    stacked: false,
-    elements:{
-        point:{
-            radius:1,
-        }
-    },
-    scales: {
-        x: {
-            type: 'time'
-        },
-      y: {
-        type: 'linear',
-        display: true,
-        position: 'left',
-      }
-    },
-  };
+import { Bar, Line } from "react-chartjs-2"
 
 export default function TotalActive({data,transcript}){
     if(!data) return
+    const [option,setoption] = useState({
+      maintainAspectRatio : false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      stacked: false,
+      elements:{
+          point:{
+              radius:1,
+          }
+      },
+      scales: {
+          x: {
+              type: 'time',
+              time:{
+                unit:'month'
+              }
+          },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+        }
+      },
+    })
     const [filter,setfilter] = useState([])
     const [range,setrange] = useState('all')
     const [datas,setdatas] = useState(null)
     useEffect(()=>{
       if(!range) return
       if(range==='all')
-      setfilter(data.accountMonth)
+      {setoption({
+        maintainAspectRatio : false,
+        interaction: {
+          mode: 'index',
+          intersect: false,
+        },
+        stacked: false,
+        elements:{
+            point:{
+                radius:1,
+            }
+        },
+        scales: {
+            x: {
+                type: 'time',
+                time:{
+                  unit:'month'
+                }
+            },
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+          }
+        },
+      })
+      setfilter(data.accountMonth)}
       else if(range==='m')
-      setfilter(data.account.slice(0,31))
+      {
+        setoption({
+          maintainAspectRatio : false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          stacked: false,
+          elements:{
+              point:{
+                  radius:1,
+              }
+          },
+          scales: {
+              x: {
+                  type: 'time',
+                  time:{
+                    unit:'day'
+                  }
+              },
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+            }
+          },
+        })
+        setfilter(data.account.slice(0,31))}
       else if(range==='y')
-      setfilter(data.accountMonth.slice(-12))
+      {
+        setoption({
+          maintainAspectRatio : false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          stacked: false,
+          elements:{
+              point:{
+                  radius:1,
+              }
+          },
+          scales: {
+              x: {
+                  type: 'time',
+                  time:{
+                    unit:'month'
+                  }
+              },
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+            }
+          },
+        })
+        setfilter(data.accountMonth.slice(-12))}
     },[data,range])
 
     useEffect(()=>{
@@ -74,7 +156,7 @@ export default function TotalActive({data,transcript}){
             </div>
         </div>
         <div className="h-48">
-          {datas && <Line options={options} data={datas} />}
+          {datas && <Bar options={option} data={datas} />}
         </div>
         </>
     )

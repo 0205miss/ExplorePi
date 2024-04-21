@@ -38,17 +38,155 @@ import { Line } from "react-chartjs-2"
 
 export default function Transaction({data,transcript}){
     if(!data) return
+    const [option, setoption] = useState({
+      maintainAspectRatio : false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      stacked: false,
+      elements:{
+          point:{
+              radius:1,
+          }
+      },
+      scales: {
+          x: {
+              type: 'time',
+              time:{
+                unit:'month'
+              }
+          },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          grid: {
+            drawOnChartArea: false,
+          },
+        },
+      },
+    });
     const [filter,setfilter] = useState([])
     const [range,setrange] = useState('all')
     const [datas,setdatas] = useState(null)
     useEffect(()=>{
       if(!range) return
-      if(range==='all')
-      setfilter(data.blockMonth)
-      else if(range==='m')
-      setfilter(data.block.slice(-31))
-      else if(range==='y')
-      setfilter(data.blockMonth.slice(-12))
+      if(range==='all'){
+        setoption({
+          maintainAspectRatio : false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          stacked: false,
+          elements:{
+              point:{
+                  radius:1,
+              }
+          },
+          scales: {
+              x: {
+                  type: 'time',
+                  time:{
+                    unit:'month'
+                  }
+              },
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              grid: {
+                drawOnChartArea: false,
+              },
+            },
+          },
+        })
+      setfilter(data.blockMonth)}
+      else if(range==='m'){
+        setoption({
+          maintainAspectRatio : false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          stacked: false,
+          elements:{
+              point:{
+                  radius:1,
+              }
+          },
+          scales: {
+              x: {
+                  type: 'time',
+                  time:{
+                    unit:'day'
+                  }
+              },
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              grid: {
+                drawOnChartArea: false,
+              },
+            },
+          },
+        })
+      setfilter(data.block.slice(-31))}
+      else if(range==='y'){
+        setoption(
+          {
+            maintainAspectRatio : false,
+            interaction: {
+              mode: 'index',
+              intersect: false,
+            },
+            stacked: false,
+            elements:{
+                point:{
+                    radius:1,
+                }
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time:{
+                      unit:'month'
+                    }
+                },
+              y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+              },
+              y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                grid: {
+                  drawOnChartArea: false,
+                },
+              },
+            },
+          }
+        )
+      setfilter(data.blockMonth.slice(-12))}
     },[data,range])
 
     useEffect(()=>{
@@ -96,7 +234,7 @@ export default function Transaction({data,transcript}){
             </div>
         </div>
         <div className="h-48">
-          {datas && <Line options={options} data={datas} />}
+          {datas && <Line options={option} data={datas} />}
         </div>
         </>
     )
