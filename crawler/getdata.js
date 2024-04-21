@@ -144,7 +144,7 @@ async function getactive(){
 async function getactiveMonth(){
     let result = await pool.query(`SELECT b.x,count(b.y) as y FROM (SELECT DATE_FORMAT(created_at, '%Y-%m') as x,count(account) as y FROM explorepi.operation group by DATE_FORMAT(created_at, '%Y-%m'),account) as b group by b.x ;`)
     result = await JSON.parse(JSON.stringify(result))
-    docRef.update({'accountMonth':result})
+    activeRef.update({'accountMonth':result})
 }
 async function getblock(){
     let result = await pool.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,count(id) as y,sum(success) as tx,sum(operation) as op,sum(fail) as tx_fail FROM explorepi.block where created_at >= now() - interval 31 day group by DATE_FORMAT(created_at, '%Y-%m-%d');`)
