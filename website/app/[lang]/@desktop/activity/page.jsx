@@ -5,7 +5,7 @@ import Top10 from './top10';
 import DailyTable from './daily';
 import RankTable from './rank';
 import TotalActive from './active';
-export const revalidate =  86400
+export const revalidate =  1800
 
 
 export async function generateStaticParams() {
