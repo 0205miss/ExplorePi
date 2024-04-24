@@ -8,7 +8,7 @@ import getago from "lib/time";
 
 export default function BlockCard({data,time,lang}) {
   return (
-    <Card className="my-2">
+    <Card>
       <CardBody>
         <div className="flex">
           <div className="flex items-center px-1 gap-2">

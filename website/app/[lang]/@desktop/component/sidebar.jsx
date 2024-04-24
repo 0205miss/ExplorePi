@@ -39,8 +39,8 @@ export default function SideBar({ lang }) {
                 (ComingSoon)
               </span>
             </p>
-            <Listbox aria-label="Explorer" disabledKeys={["block", "tx","op"]} classNames={{list:'gap-1'}}>
-              <ListboxItem key="block" aria-label="block" href={"/" + lang + "/block"} className="!bg-slate-300">
+            <Listbox aria-label="Explorer" disabledKeys={["tx","op"]} classNames={{list:'gap-1'}}>
+              <ListboxItem key="block" aria-label="block" href={"/" + lang + "/block"}>
               <FontAwesomeIcon icon={faCubes} /> <span className="ml-2">Block</span>
               </ListboxItem>
               <ListboxItem key="tx" aria-label="tx" href={"/" + lang + "/tx"} className="bg-slate-300">
