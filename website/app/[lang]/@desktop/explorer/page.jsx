@@ -2,6 +2,7 @@ import "server-only";
 import { translate } from "translate-config";
 import admin from "lib/database";
 import BlockChainData from "./data";
+import BlockStream from "./blockstream";
 export const revalidate = 1800;
 
 export async function generateStaticParams() {
@@ -15,9 +16,10 @@ export default async function ExplorerPage({ params: { lang } }) {
   let dataobj = data.data();
   return (
     <>
-      <div className="p-5 pb-10 w-full h-full overflow-hidden">
-        <div className="flex w-full h-full flex-col">
+      <div className="p-5 pb-16 w-full h-full overflow-hidden">
+        <div className="flex w-full h-auto flex-col">
           <BlockChainData data={dataobj} transcript={transcript.statistic} />
+          <BlockStream time={transcript.time}/>
         </div>
       </div>
     </>

@@ -5,6 +5,8 @@ import { translate } from "translate-config";
 import LockTime from "./locktime";
 import { Roboto_Mono } from "next/font/google";
 import FutureUnlock from "./future";
+import { Info } from "icon/info";
+import { Tooltip } from "@nextui-org/react";
 export const revalidate = 1800;
 
 const roboto_Mono = Roboto_Mono({
@@ -145,7 +147,7 @@ export default async function StatisticPage({ params: { lang } }) {
                   </td>
                 </tr>
                 <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
-                  <td className="  py-2 font-medium">MayLostPi</td>
+                  <td className="  py-2 font-medium inline-flex">MayLostPi <Tooltip content='Not claim after unlock 1 year'><Info className='ml-1 fill-cyan-400 h-6'/></Tooltip></td>
                   <td className=" px-3 py-2 text-xs">
                     {Number.parseFloat(dataobj.oneyearunclaimed).toLocaleString(
                       "en-US",
