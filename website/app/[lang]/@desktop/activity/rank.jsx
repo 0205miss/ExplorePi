@@ -60,7 +60,7 @@ export default function RankTable({ data }) {
             <TableCell>{"<=1,000,000"}</TableCell>
             <TableCell>{data[8].result}</TableCell>
           </TableRow>
-          {data[9].result != undefined && <TableRow key="10">
+          {data[9] != undefined && <TableRow key="10">
             <TableCell>{">1,000,000"}</TableCell>
             <TableCell>{data[9].result}</TableCell>
           </TableRow>}
