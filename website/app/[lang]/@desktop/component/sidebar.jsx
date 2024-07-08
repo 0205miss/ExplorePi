@@ -10,9 +10,13 @@ import {
   faServer,
   faUsers,
   faCircleQuestion,
+  faShieldHalved,
+  faInbox,
+  faFlask,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { Divider,Listbox, ListboxItem } from "@nextui-org/react";
+import { faGithub } from "@fortawesome/free-brands-svg-icons";
 export default function SideBar({ lang }) {
   return (
     <>
@@ -35,9 +39,6 @@ export default function SideBar({ lang }) {
           <section className="px-3 py-4">
             <p className="font-semibold uppercase">
               Explorer
-              <span className=" font-mono mt-0 font-normal normal-case tracking-tighter text-xs">
-                (ComingSoon)
-              </span>
             </p>
             <Listbox aria-label="Explorer" classNames={{list:'gap-1'}}>
               <ListboxItem key="block" aria-label="block" href={"/" + lang + "/block"}>
@@ -54,7 +55,9 @@ export default function SideBar({ lang }) {
           <Divider/>
           <section className="px-3 py-4">
             <p className="font-semibold uppercase">
-            Dashboard
+            Dashboard<span className=" font-mono mt-0 font-normal normal-case tracking-tighter text-xs">
+                (MainNet)
+              </span>
             </p>
             <Listbox aria-label="Dashboard" variant={'flat'} classNames={{list:'gap-1'}}>
               <ListboxItem key="network" aria-label="network" href={"/" + lang + "/network"}>
@@ -68,6 +71,38 @@ export default function SideBar({ lang }) {
               <ListboxItem key="activity" aria-label="activity" href={"/" + lang + "/activity"}>
               <FontAwesomeIcon icon={faUsers} />
                 <span className="ml-2">Activity</span>
+              </ListboxItem>
+            </Listbox>
+          </section>
+          <Divider/>
+          <section className="px-3 py-4">
+            <p className="font-semibold uppercase">
+            Laboratory
+            </p>
+            <Listbox aria-label="Laboratory" variant={'flat'} classNames={{list:'gap-1'}}>
+              <ListboxItem key="dev" aria-label="dev" href={"https://pi-laboratory.vercel.app/#?network=TestNet"}>
+              <FontAwesomeIcon icon={faFlask} />
+                <span className="ml-2">Pi BlockChain Lab</span>
+              </ListboxItem>
+            </Listbox>
+          </section>
+          <Divider/>
+          <section className="px-3 py-4">
+            <p className="font-semibold uppercase">
+            About
+            </p>
+            <Listbox aria-label="Dashboard" variant={'flat'} classNames={{list:'gap-1'}}>
+              <ListboxItem key="dev" aria-label="dev" href={"https://kaikai-beryl.vercel.app/"}>
+              <FontAwesomeIcon icon={faInbox} />
+                <span className="ml-2">Developer</span>
+              </ListboxItem>
+              <ListboxItem key="github" aria-label="github" href={"https://github.com/0205miss/explorepi"}>
+              <FontAwesomeIcon icon={faGithub} />
+                <span className="ml-2">Github</span>
+              </ListboxItem>
+              <ListboxItem key="policy" aria-label="policy" href={"/policy.html"}>
+              <FontAwesomeIcon icon={faShieldHalved} />
+                <span className="ml-2">Privacy</span>
               </ListboxItem>
             </Listbox>
           </section>
