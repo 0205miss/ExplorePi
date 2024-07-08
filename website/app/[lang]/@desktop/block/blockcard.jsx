@@ -21,7 +21,7 @@ export default function BlockCard({data,time,lang}) {
             </div>
           </div>
           <div className="grow flex justify-center items-center px-1">
-            <Progress value={data.tx_set_operation_count/data.max_tx_set_size} label="Capacity" showValueLabel valueLabel={`${data.tx_set_operation_count}/${data.max_tx_set_size}`} color="secondary" />
+            <Progress value={data.tx_set_operation_count/10} label="Capacity" showValueLabel valueLabel={`${data.tx_set_operation_count}/${data.max_tx_set_size}`} color="secondary" />
           </div>
           <div className="px-1 flex gap-2 items-center w-36">
             <div className="flex-col flex justify-around gap-1">

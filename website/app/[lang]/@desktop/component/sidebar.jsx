@@ -39,14 +39,14 @@ export default function SideBar({ lang }) {
                 (ComingSoon)
               </span>
             </p>
-            <Listbox aria-label="Explorer" disabledKeys={["tx","op"]} classNames={{list:'gap-1'}}>
+            <Listbox aria-label="Explorer" classNames={{list:'gap-1'}}>
               <ListboxItem key="block" aria-label="block" href={"/" + lang + "/block"}>
               <FontAwesomeIcon icon={faCubes} /> <span className="ml-2">Block</span>
               </ListboxItem>
-              <ListboxItem key="tx" aria-label="tx" href={"/" + lang + "/tx"} className="bg-slate-300">
+              <ListboxItem key="tx" aria-label="tx" href={"/" + lang + "/tx"}>
               <FontAwesomeIcon icon={faHandshake} /><span className="ml-2">Transaction</span>
               </ListboxItem>
-              <ListboxItem key="op" aria-label="op" href={"/" + lang + "/op"} className="bg-slate-300">
+              <ListboxItem key="op" aria-label="op" href={"/" + lang + "/op"}>
               <FontAwesomeIcon icon={faPencil} /><span className="ml-2">Operation</span>
               </ListboxItem>
             </Listbox>

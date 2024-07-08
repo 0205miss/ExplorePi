@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import BlockCard from "./blockcard";
+import TransactionCard from "./txcard";
 import { useEffect, useState } from "react";
 import { Card, CardBody, Skeleton } from "@nextui-org/react";
 
@@ -14,7 +14,7 @@ export default function BlockStream({ time, lang }) {
   useEffect(() => {
     if (server) {
       server
-        .ledgers()
+        .transactions()
         .cursor("now")
         .stream({
           onmessage: (res) => {
@@ -36,15 +36,15 @@ export default function BlockStream({ time, lang }) {
         onReady={streamStart}
       ></Script>
       <Card>
-        <CardBody>Latest Block Stream</CardBody>
+        <CardBody>Latest Transaction Stream</CardBody>
       </Card>
       {data != [] &&
         data != undefined &&
         data.map((perblock) => {
           if (perblock == undefined || perblock == null) return;
           return (
-            <div className="my-2" key={perblock.sequence}>
-              <BlockCard
+            <div className="my-2" key={perblock.id}>
+              <TransactionCard
                 data={perblock}                
                 time={time}
                 lang={lang}
@@ -55,15 +55,16 @@ export default function BlockStream({ time, lang }) {
       {data.length < 10 &&
         [...Array(10 - data.length)].map((x, i) => (
           <Skeleton key={i} className="my-2">
-            <BlockCard
+            <TransactionCard
               data={{
-                sequence: 10000000,
+                ledger_attr: 10000000,
                 hash: "afahgfighzs",
-                tx_set_operation_count: 0,
-                max_tx_set_size: 1000,
-                successful_transaction_count: 20,
-                failed_transaction_count: 10,
-                closed_at: "2021-01-27T22:58:44Z",
+                source_account: 'GABV',
+                successful: true,
+                fee_charged: "100000",
+                operation_count: 10,
+                memo_type:"none", //text
+                created_at: "2021-01-27T22:58:44Z",
               }}              
               time={time}
               lang={lang}

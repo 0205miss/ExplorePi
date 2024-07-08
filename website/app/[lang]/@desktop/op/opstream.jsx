@@ -1,11 +1,11 @@
 "use client";
 
 import Script from "next/script";
-import BlockCard from "./blockcard";
+import OperationCard from "./opcard";
 import { useEffect, useState } from "react";
 import { Card, CardBody, Skeleton } from "@nextui-org/react";
 
-export default function BlockStream({ time, lang }) {
+export default function OperationStream({ time, lang, opts }) {
   const [data, setdata] = useState([]);
   const [server, setserver] = useState();
   const streamStart = () => {
@@ -14,7 +14,7 @@ export default function BlockStream({ time, lang }) {
   useEffect(() => {
     if (server) {
       server
-        .ledgers()
+        .operations()
         .cursor("now")
         .stream({
           onmessage: (res) => {
@@ -25,18 +25,32 @@ export default function BlockStream({ time, lang }) {
   }, [server]);
 
   function handler_data(res) {
-    setdata((olddata) =>olddata.length==10 ? [res, olddata[0],olddata[1],olddata[2],olddata[3],olddata[4],olddata[5],olddata[6],olddata[7],olddata[8]] : [res, ...olddata]);
+    setdata((olddata) =>
+      olddata.length == 10
+        ? [
+            res,
+            olddata[0],
+            olddata[1],
+            olddata[2],
+            olddata[3],
+            olddata[4],
+            olddata[5],
+            olddata[6],
+            olddata[7],
+            olddata[8],
+          ]
+        : [res, ...olddata]
+    );
   }
 
   return (
     <>
       <Script
         src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/10.4.1/stellar-sdk.js"
-        
         onReady={streamStart}
       ></Script>
       <Card>
-        <CardBody>Latest Block Stream</CardBody>
+        <CardBody>Latest Operation Stream</CardBody>
       </Card>
       {data != [] &&
         data != undefined &&
@@ -44,10 +58,11 @@ export default function BlockStream({ time, lang }) {
           if (perblock == undefined || perblock == null) return;
           return (
             <div className="my-2" key={perblock.sequence}>
-              <BlockCard
-                data={perblock}                
+              <OperationCard
+                data={perblock}
                 time={time}
                 lang={lang}
+                opts={opts}
               />
             </div>
           );
@@ -55,16 +70,19 @@ export default function BlockStream({ time, lang }) {
       {data.length < 10 &&
         [...Array(10 - data.length)].map((x, i) => (
           <Skeleton key={i} className="my-2">
-            <BlockCard
+            <OperationCard
+              opts={opts}
               data={{
-                sequence: 10000000,
-                hash: "afahgfighzs",
-                tx_set_operation_count: 0,
-                max_tx_set_size: 1000,
-                successful_transaction_count: 20,
-                failed_transaction_count: 10,
-                closed_at: "2021-01-27T22:58:44Z",
-              }}              
+                source_account: "10000000",
+                transaction_hash: "afahgfighzs",
+                transaction_successful: true,
+                type: "payment",
+                from: "GATBFSBBSBGNBSG",
+                to: "GATBFSBBSBGNBSG",
+                source_account: "GATBFSBBSBGNBSG",
+                amount:'0.01',
+                created_at: "2021-01-27T22:58:44Z",
+              }}
               time={time}
               lang={lang}
             />
