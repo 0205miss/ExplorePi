@@ -52,7 +52,7 @@ export default function NavbarMobile({ lang }) {
       <NavbarMenu >
         {dataItems.map((item, index) => (
           <NavbarMenuItem key={`${item}-${index}`}>
-            <Link
+            <Link prefetch={false}
               color={
                 pathname.includes(menupath[index]) ? "primary" : "foreground"
               }
@@ -69,7 +69,7 @@ export default function NavbarMobile({ lang }) {
 
         {statusItems.map((item, index) => (
           <NavbarMenuItem key={`${item}-${index}`}>
-            <Link
+            <Link prefetch={false}
               color={
                 pathname.includes(menupath[index]) ? "primary" : "foreground"
               }
@@ -84,7 +84,7 @@ export default function NavbarMobile({ lang }) {
 
         <Divider />
         <NavbarMenuItem key={`pi-lab`}>
-          <Link
+          <Link prefetch={false}
             color={
               "foreground"
             }
@@ -99,7 +99,7 @@ export default function NavbarMobile({ lang }) {
 
         {menuItems.map((item, index) => (
           <NavbarMenuItem key={`${item}-${index}`}>
-            <Link
+            <Link prefetch={false}
               color={
                 pathname.includes(menupath[index]) ? "primary" : "foreground"
               }

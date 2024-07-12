@@ -37,14 +37,14 @@ export default function Payment({transcript,time,lang}){
                     return(
                         <tr key={index} className='border-b border-slate-300 text-lg'>
                             <td className="py-2">
-                                <Link href={`./account/${data.from}`}>
+                                <Link prefetch={false} href={`./account/${data.from}`}>
                                     <span className=" inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-purple-400 text-white rounded-full">
                                     {from_account}
                                     </span>
                                 </Link>
                             </td>
                             <td className="py-2">
-                                <Link href={`./account/${data.to}`}>
+                                <Link prefetch={false} href={`./account/${data.to}`}>
                                     <span className=" inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-yellow-300 text-white rounded-full">
                                     {to_account}
                                     </span>

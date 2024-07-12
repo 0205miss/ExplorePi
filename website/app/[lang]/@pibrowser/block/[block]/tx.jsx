@@ -54,7 +54,7 @@ export default function Transaction({block,transcript,lang}){
                             return(
                             <tr key={index} className='border-b border-slate-300 text-lg'>
                                 <td className="py-2">
-                                    <Link href={`/${lang}/tx/${record.hash}`}>
+                                    <Link prefetch={false} href={`/${lang}/tx/${record.hash}`}>
                                         <span className=" inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-green-400 text-white rounded-full">
                                         {record.hash.substring(0,8)}
                                         </span>
@@ -62,7 +62,7 @@ export default function Transaction({block,transcript,lang}){
                                 </td>
                                 <td className="py-2">{record.operation_count}</td>
                                 <td className="py-2">
-                                    <Link href={`/${lang}/account/${record.source_account}`}>
+                                    <Link prefetch={false} href={`/${lang}/account/${record.source_account}`}>
                                     <span className=" inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-purple-400 text-white rounded-full">
                                     {record.source_account.substring(0,4)}
                                     </span>

@@ -22,7 +22,7 @@ export default function NavBar({ transcript,lang }){
         <>
         <Script src="https://sdk.minepi.com/pi-sdk.js" onLoad={handleScript}/>
         <ul className="shadow flex fixed bottom-0 justify-center w-full font-mono overflow-hidden bg-white">
-            <Link href={`/${lang}/statistic`} className='w-1/4'>
+            <Link prefetch={false} href={`/${lang}/statistic`} className='w-1/4'>
                 <li>
                     <button 
                     type="button" 
@@ -35,7 +35,7 @@ export default function NavBar({ transcript,lang }){
                     </button>
                 </li>
             </Link>
-            <Link href={`/${lang}/explorer`} className='w-1/4'>            
+            <Link prefetch={false} href={`/${lang}/explorer`} className='w-1/4'>            
                 <li >
                     <button 
                     type="button" 
@@ -49,7 +49,7 @@ export default function NavBar({ transcript,lang }){
                 </li>
             </Link>
 
-            <Link href={`/${lang}/stream`} className='w-1/4'>            
+            <Link prefetch={false} href={`/${lang}/stream`} className='w-1/4'>            
                 <li>
                     <button 
                     type="button" 
@@ -63,7 +63,7 @@ export default function NavBar({ transcript,lang }){
                 </li>
             </Link>
 
-            <Link href={`/${lang}/personal`} className='w-1/4'>            
+            <Link prefetch={false} href={`/${lang}/personal`} className='w-1/4'>            
                 <li>
                     <button 
                     type="button" 

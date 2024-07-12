@@ -25,7 +25,7 @@ export default function BlockStream({time,lang}) {
   }, [server]);
 
   function handler_data(res) {
-    setdata(olddata =>[res, olddata[0], olddata[1], olddata[2], olddata[3]]);
+    setdata(olddata =>[res]);
   }
 
   return (
@@ -54,8 +54,8 @@ export default function BlockStream({time,lang}) {
         </Skeleton>;
           return <div className="my-2" key={perblock.sequence}><BlockCard  data={perblock} time={time} lang={lang}/></div>;
         })}
-        {data.length < 5 &&
-        [...Array(5 - data.length)].map((x, i) => (
+        {data.length < 1 &&
+        [...Array(1 - data.length)].map((x, i) => (
           <Skeleton key={i} className="my-2">
             <BlockCard
               data={{

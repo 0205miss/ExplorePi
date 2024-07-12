@@ -33,7 +33,7 @@ export default function Block({lang,transcript,time}){
                     return(
                         <tr key={index} className='border-b border-slate-300 text-lg'>
                             <td className="py-2">
-                                <Link href={`./block/${data.sequence}`}>
+                                <Link prefetch={false} href={`./block/${data.sequence}`}>
                                     <span className=" inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-blue-400 text-white rounded-full">
                                     {data.sequence}
                                     </span>
