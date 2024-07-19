@@ -4,7 +4,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import Head from "./head";
 import GetUser from "./getuser";
 import { Inter } from "next/font/google";
-import ReactGA from 'react-ga4';
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,11 +13,10 @@ const inter = Inter({
 config.autoAddCss = false;
 
 export default function RootLayout({ children, params }) {
-  const TRACKING_ID = "G-QLRT9ML5H4"; // OUR_TRACKING_ID
-  ReactGA.initialize(TRACKING_ID);
   return (
     <html lang={params.lang} className={inter.className}>
       <Head />
+      <GoogleAnalytics gaId="G-QLRT9ML5H4" />
       <body>
         <script
           async
