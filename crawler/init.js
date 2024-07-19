@@ -156,11 +156,8 @@ async function getblockMonth(){
     result = await JSON.parse(JSON.stringify(result))
     netRef.update({'blockMonth':result})
 }
-async function statistic(){
-    await getTop10()
+export async function init(){
     await getblocktime() 
-    await getTop10payment()
-    await getTop10fee()
     await getopdistribute()
     await getclaimed()
     await getclaimedback()
@@ -171,7 +168,6 @@ async function statistic(){
     await getblocktimeMonth()
     await getlockupperiod()
     await getmetric()
-    await getdailymetric()
     await getunlocknotclaimed()
     await getavailablepi()
     await getfutureunlock()
@@ -186,25 +182,3 @@ async function statistic(){
         timestamp: Date.now()
         });
 }
-
-
-const start = () => {
-    console.log('Getdata start')
-    statistic()
-    const job = schedule.scheduleJob('0 * * * *', function(){
-        statistic()
-    });
-
-    const rl = readline.createInterface({ input, output });
-
-    rl.question('Press q to exit\n', (answer) => {
-      // TODO: Log the answer in a database
-      if (answer === 'q'){
-        job.cancel();
-      }
-      rl.close();
-      
-    });
-}
-
-start();

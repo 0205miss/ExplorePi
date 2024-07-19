@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
-
+const {
+  default: flattenColorPalette,
+} = require("tailwindcss/lib/util/flattenColorPalette");
 const { nextui } = require("@nextui-org/react");
 
 module.exports = {
@@ -28,6 +30,7 @@ module.exports = {
   },
   darkMode: "class",
   plugins: [
+    addVariablesForColors,
     nextui({
       themes: {
         "purple-style": {
@@ -62,3 +65,14 @@ module.exports = {
     }),
   ],
 };
+
+function addVariablesForColors({ addBase, theme }) {
+  let allColors = flattenColorPalette(theme("colors"));
+  let newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+  );
+ 
+  addBase({
+    ":root": newVars,
+  });
+}
