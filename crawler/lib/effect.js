@@ -89,6 +89,9 @@ function trustline_remove_sql(res){
 function claimable_balance_create_sql(res){
     let date = res.created_at.slice(0, 19).replace('T', ' ')
     let sql = "INSERT INTO claimant(id,created_at,amount) VALUES ('"+res.balance_id+"','"+date+"',"+res.amount+") ON DUPLICATE KEY UPDATE created_at=VALUES(created_at),amount=VALUES(amount)"
+    if(res.account!="GABT7EMPGNCQSZM22DIYC4FNKHUVJTXITUF6Y5HNIWPU4GA7BHT4GC5G"){
+        sql = "INSERT INTO claimant(id,created_at,amount,ct_create) VALUES ('"+res.balance_id+"','"+date+"',"+res.amount+",0) ON DUPLICATE KEY UPDATE created_at=VALUES(created_at),amount=VALUES(amount),ct_create=VALUES(ct_create)"
+    }
     let string = res.paging_token + ' effect finished'
     worker+=1
     pool.ex_sql(sql,string).then(

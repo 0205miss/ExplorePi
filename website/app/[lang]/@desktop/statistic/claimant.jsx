@@ -1,4 +1,5 @@
 'use client'
+
 import { useEffect, useState } from "react"
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-luxon';
@@ -28,7 +29,11 @@ export default function Claimant({data,transcript}){
             },
             scales: {
                 x: {
-                    type: 'time'
+                  type: 'time',
+                  time:{
+                    tooltipFormat:'yyyy-LL',
+                    unit: 'month'
+                  }
                 },
               y: {
                 type: 'linear',
@@ -158,7 +163,11 @@ export default function Claimant({data,transcript}){
                 x: {
                     type: 'time',
                     min: Date.now()-31556952000,
-                    max: Date.now()
+                    max: Date.now(),
+                    time:{
+                      tooltipFormat:'yyyy-LL',
+                      unit: 'month'
+                    }
                 },
               y: {
                 type: 'linear',

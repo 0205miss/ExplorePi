@@ -6,7 +6,9 @@ import LockTime from "./locktime";
 import { Roboto_Mono } from "next/font/google";
 import FutureUnlock from "./future";
 import ToolTipMayLost from "./tooltip";
-export const revalidate = 1800;
+import AccountCreation from "./accountCreation";
+import Circulation from "./circulation";
+//export const revalidate = 1800;
 
 const roboto_Mono = Roboto_Mono({
   subsets: ["latin"],
@@ -21,7 +23,57 @@ export default async function StatisticPage({ params: { lang } }) {
   const transcript = await import(`locales/${lang}.json`);
   const db = admin.firestore();
   const data = await db.collection("statistic").doc("data").get();
+  const now = new Date();
   let dataobj = data.data();
+  //circulation
+  let month_start = new Date(2022, 5, 5);
+  let result_array = [];
+  while (true) {
+    if (
+      month_start.getUTCFullYear() == now.getUTCFullYear() &&
+      month_start.getUTCMonth() == now.getUTCMonth()
+    ) {
+      break;
+    } else {
+      result_array.push({ x: new Date(month_start) });
+      month_start.setUTCMonth(month_start.getUTCMonth() + 1);
+      month_start.setUTCDate(5);
+    }
+  }
+  let a = 0,
+    b = 0,
+    c = 0,
+    claimedMonth_copy = dataobj.claimedMonth.slice(),
+    createclaimantMonth_copy = dataobj.createclaimantMonth.slice();
+
+  result_array.map((data, i) => {
+    if (
+      claimedMonth_copy.length > 0 &&
+      claimedMonth_copy[0].x.substring(0, 4) == data.x.getUTCFullYear() &&
+      parseInt(claimedMonth_copy[0].x.substring(5)) == data.x.getUTCMonth() + 1
+    ) {
+      b += parseFloat(claimedMonth_copy[0].z);
+      data.b = b;
+      claimedMonth_copy.shift();
+    }else{
+      data.b = b;
+    }
+
+    if (
+      createclaimantMonth_copy.length > 0 &&
+      createclaimantMonth_copy[0].x.substring(0, 4) ==
+        data.x.getUTCFullYear() &&
+      parseInt(createclaimantMonth_copy[0].x.substring(5)) ==
+        data.x.getUTCMonth() + 1
+    ) {
+      c += parseFloat(createclaimantMonth_copy[0].z);
+      data.c = c-b;
+      createclaimantMonth_copy.shift();
+    }else{
+      data.c = c-b;
+    }
+  });
+
   /*block data*/
   dataobj.blocktime.map((data) => {
     if (data.y > 10) data.y = null;
@@ -43,6 +95,14 @@ export default async function StatisticPage({ params: { lang } }) {
   dataobj.claimed.map((data) => {
     data.x = new Date(data.x).getTime();
   });
+
+  dataobj.accountCreation.map((data, i) => {
+    data.x = new Date(data.x).getTime();
+    if (i != 0) {
+      data.y += dataobj.accountCreation[i - 1].y;
+    }
+  });
+
   dataobj.claimedback.map((data) => {
     data.x = new Date(data.x).getTime();
   });
@@ -146,7 +206,9 @@ export default async function StatisticPage({ params: { lang } }) {
                   </td>
                 </tr>
                 <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
-                  <td className="justify-center items-center  py-2 font-medium inline-flex select-all">MayLostPi <ToolTipMayLost/></td>
+                  <td className="justify-center items-center  py-2 font-medium inline-flex select-all">
+                    MayLostPi <ToolTipMayLost />
+                  </td>
                   <td className=" px-3 py-2 text-xs">
                     {Number.parseFloat(dataobj.oneyearunclaimed).toLocaleString(
                       "en-US",
@@ -161,8 +223,23 @@ export default async function StatisticPage({ params: { lang } }) {
         </div>
 
         <div className="w-full">
+          <AccountCreation
+            data={dataobj}
+            transcript={transcript.statistic.Migrate}
+          />
+        </div>
+
+        <div className="w-full">
           <Claimant data={dataobj} transcript={transcript.statistic.Migrate} />
         </div>
+
+        <div className="w-full">
+          <Circulation
+            data={result_array}
+            transcript={transcript.statistic.Migrate}
+          />
+        </div>
+
         <div className="w-full">
           <FutureUnlock
             data={dataobj}

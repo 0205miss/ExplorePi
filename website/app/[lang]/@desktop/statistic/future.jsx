@@ -27,10 +27,10 @@ export default function Claimant({ data, transcript }) {
         },
         scales: {
           x: {
-            type: "time",
-            time: {
-                unit: 'month',
-                tooltipFormat:'yyyy / MM'
+            type: 'time',
+            time:{
+              tooltipFormat:'yyyy-LL',
+              unit: 'month'
             }
           },
           y: {
@@ -153,7 +153,7 @@ export default function Claimant({ data, transcript }) {
             max: Date.now() + 31556952000,
             time: {
                 unit: 'month',
-                tooltipFormat:'yyyy / MM'
+                tooltipFormat:'yyyy / LL'
             }
           },
           y: {
