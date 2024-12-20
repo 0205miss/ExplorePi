@@ -3,7 +3,7 @@ export default function Head() {
     <>
       <title>ExplorePi</title>
       <meta content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" name="viewport" />
-      <meta name="description" content="A novel, improved, and mobile friendly block explorer for the Pi blockchain made by Pioneers for Pioneers" />
+      <meta name="description" content="A novel, improved, and mobile friendly block explorer for the Pi blockchain made by Pioneers for Pioneers. New interface for Pi Blockchain Explore " />
       <link rel="icon" href="/newfavicon.ico" />
     </>
   )
