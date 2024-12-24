@@ -6,7 +6,6 @@ import BlockStream from "./blockstream";
 import banner from "public/banner.png";
 import Image from "next/image";
 import Banner from "./banner";
-export const revalidate = 1800;
 
 export async function generateStaticParams() {
   return translate.locales.map((locale) => ({ lang: locale }));
