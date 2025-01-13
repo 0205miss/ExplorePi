@@ -22,7 +22,7 @@ export default function SideBar({ lang }) {
       <div className="md:h-full md:block md:fixed md:bg-white hidden">
         <div className="w-64 h-full border-r-1">
           <section className="px-5 py-4">
-            <Link href={"/" + lang + "/explorer"}>
+            <Link prefetch={false} href={"/" + lang + "/explorer"}>
               <div className="flex items-center h-14 px-4">
                 <Image
                   className="rounded-lg"

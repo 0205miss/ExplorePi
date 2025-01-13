@@ -63,7 +63,7 @@ export default function Top10({ data, lang, transcript }) {
                           )}
 
                           <td className="px-2 py-4 text-sm font-medium text-gray-900">
-                            <Link href={`/${lang}/account/${data.account}`}>
+                            <Link prefetch={false} href={`/${lang}/account/${data.account}`}>
                               <span className=" inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-purple-400 text-white rounded-full">
                                 {account}
                               </span>
@@ -132,7 +132,7 @@ export default function Top10({ data, lang, transcript }) {
                           )}
 
                           <td className="px-2 py-4 text-sm font-medium text-gray-900">
-                            <Link href={`/${lang}/account/${data.account}`}>
+                            <Link prefetch={false} href={`/${lang}/account/${data.account}`}>
                               <span className=" inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-purple-400 text-white rounded-full">
                                 {account}
                               </span>
@@ -201,7 +201,7 @@ export default function Top10({ data, lang, transcript }) {
                           )}
 
                           <td className="px-2 py-4 text-sm font-medium text-gray-900">
-                            <Link href={`/${lang}/account/${data.account}`}>
+                            <Link prefetch={false} href={`/${lang}/account/${data.account}`}>
                               <span className=" inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-purple-400 text-white rounded-full">
                                 {account}
                               </span>

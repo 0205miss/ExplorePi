@@ -14,8 +14,8 @@ const activeRef = db.collection("statistic").doc("active");
 async function getTop10() {
   let result =
     await pool.query(`SELECT account,(org.balance-totalfee.total) as balance 
-FROM (SELECT * from explorepi.Account where Role <> 'CoreTeam' OR Role is null order by balance desc LIMIT 0, 10) as org
-    JOIN (SELECT sum(amount) as total,account FROM explorepi.fee where account in (SELECT * FROM (SELECT public_key from explorepi.Account where Role <> 'CoreTeam' OR Role is null order by balance desc LIMIT 0, 10) as t) group by account order by total desc) as totalfee ON  org.public_key = totalfee.account
+FROM (SELECT * from explorepi.Account where Role <> 'CoreTeam' OR Role is null order by balance desc LIMIT 0, 50) as org
+    JOIN (SELECT sum(amount) as total,account FROM explorepi.fee where account in (SELECT * FROM (SELECT public_key from explorepi.Account where Role <> 'CoreTeam' OR Role is null order by balance desc LIMIT 0, 50) as t) group by account order by total desc) as totalfee ON  org.public_key = totalfee.account
     order by balance desc LIMIT 0, 10`);
   result = await JSON.parse(JSON.stringify(result));
   docRef.update({ top10: result });
@@ -166,7 +166,7 @@ async function getlockupperiod() {
 }
 async function getmetric() {
   let result = await pool.query(
-    `SELECT a.a as TotalAccount,b.a as TotalPi,c.a as TotalClaim,b.a-c.a as TotalLock,d.a as TotalPioneer from(SELECT count(*) as a FROM explorepi.Account)as a,(SELECT sum(amount) as a FROM explorepi.claimant where status<>2) as b,(SELECT sum(amount) as a FROM explorepi.claimant where status=1)as c,(SELECT count(distinct account) as a FROM explorepi.claimant)as d`
+    `SELECT a.a as TotalAccount,b.a as TotalPi,c.a as TotalClaim,b.a-c.a as TotalLock,d.a as TotalPioneer from(SELECT count(*) as a FROM explorepi.Account)as a,(SELECT sum(amount) as a FROM explorepi.claimant where status<>2 and ct_create=1) as b,(SELECT sum(amount) as a FROM explorepi.claimant where status=1 and ct_create=1)as c,(SELECT count(distinct account) as a FROM explorepi.claimant)as d`
   );
   result = await JSON.parse(JSON.stringify(result));
   docRef.update({ metric: result[0] });

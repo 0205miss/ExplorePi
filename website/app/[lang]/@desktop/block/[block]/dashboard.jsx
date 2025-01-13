@@ -37,7 +37,7 @@ export default function Dashboard({lang,block,transcript}){
                         </td>
                         <td className=" px-3 py-1">
                             {data &&
-                                <Link href={`/${lang}/block/${data.sequence-1}`}>
+                                <Link prefetch={false} href={`/${lang}/block/${data.sequence-1}`}>
                                             <span className=" inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-blue-400 text-white rounded-full">
                                             {data.prev_hash.substring(0,8)}...
                                             </span>
