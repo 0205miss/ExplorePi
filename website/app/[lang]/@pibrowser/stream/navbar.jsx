@@ -2,7 +2,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Link from 'next/link'
 import clsx from 'clsx'
-import {  usePathname  } from 'next/navigation';
 import { faChartSimple, faCubes, faTvAlt, faUserTag } from '@fortawesome/free-solid-svg-icons';
 import Script from 'next/script';
 export default function NavBar({ transcript,lang }){

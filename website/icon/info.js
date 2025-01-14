@@ -1,10 +1,11 @@
 import * as React from "react";
-const SVGComponent = (props) => (
+const SVGComponent = ({fill = "currentColor", filled, size, height, width, ...props}) => (
   <svg
-    width="100%"
-    height="100%"
+    width={size || width || 24}
+    height={size || height || 24}
     viewBox="0 0 16 16"
     xmlns="http://www.w3.org/2000/svg"
+    fill={filled ? fill : "#00000"}
     {...props}
   >
     <path

@@ -8,6 +8,8 @@ import FutureUnlock from "./future";
 import ToolTipMayLost from "./tooltip";
 import AccountCreation from "./accountCreation";
 import Circulation from "./circulation";
+import ExplainPopOver from "components/ui/explain-pop";
+import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 //export const revalidate = 1800;
 
 const roboto_Mono = Roboto_Mono({
@@ -55,7 +57,7 @@ export default async function StatisticPage({ params: { lang } }) {
       b += parseFloat(claimedMonth_copy[0].z);
       data.b = b;
       claimedMonth_copy.shift();
-    }else{
+    } else {
       data.b = b;
     }
 
@@ -67,10 +69,10 @@ export default async function StatisticPage({ params: { lang } }) {
         data.x.getUTCMonth() + 1
     ) {
       c += parseFloat(createclaimantMonth_copy[0].z);
-      data.c = c-b;
+      data.c = c - b;
       createclaimantMonth_copy.shift();
-    }else{
-      data.c = c-b;
+    } else {
+      data.c = c - b;
     }
   });
 
@@ -138,11 +140,18 @@ export default async function StatisticPage({ params: { lang } }) {
             {transcript.statistic.Metrics.title}
           </div>
           <div className=" rounded-md overflow-hidden shadow-lg mb-4">
-            <table className="w-full text-center table-fixed">
+            <table className="w-full text-center table-auto">
               <tbody>
                 <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
+                  <td className="py-1">
+                    <ExplainPopOver
+                      title="All Account"
+                      content="Include CT Account"
+                    />
+                  </td>
                   <td className=" py-2 font-medium">
                     {transcript.statistic.Metrics.TotalAccount}
+                    <div className=" absolute top-0"></div>
                   </td>
                   <td className=" px-3 py-2">
                     {Number.parseInt(
@@ -151,12 +160,24 @@ export default async function StatisticPage({ params: { lang } }) {
                   </td>
                 </tr>
                 <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
+                  <td className="py-1">
+                    <ExplainPopOver
+                      title="All Account"
+                      content="Only Pioneers"
+                    />
+                  </td>
                   <td className=" py-2 font-medium">
                     {transcript.statistic.Metrics.TotalPioneer}
                   </td>
                   <td className=" px-3 py-2">{totalpioneer}</td>
                 </tr>
                 <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
+                  <td className="py-1">
+                    <ExplainPopOver
+                      title="Migrated Pi"
+                      content="Calculated by all amount of claimant by GABT"
+                    />
+                  </td>
                   <td className="  py-2 font-medium">
                     {transcript.statistic.Metrics.MigratedPi}
                   </td>
@@ -169,6 +190,12 @@ export default async function StatisticPage({ params: { lang } }) {
                   </td>
                 </tr>
                 <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
+                  <td className="py-1">
+                    <ExplainPopOver
+                      title="Pioneer Hold"
+                      content="All claimed Pi after unlock(only claimant from GABT)"
+                    />
+                  </td>
                   <td className="  py-2 font-medium">
                     {transcript.statistic.Metrics.PioneerHold}
                   </td>
@@ -182,6 +209,12 @@ export default async function StatisticPage({ params: { lang } }) {
                   </td>
                 </tr>
                 <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
+                  <td className="py-1">
+                    <ExplainPopOver
+                      title="UnLock"
+                      content="All unclaimed Pi after unlock"
+                    />
+                  </td>
                   <td className="  py-2 font-medium">
                     {transcript.statistic.Metrics.PiLocked}
                   </td>
@@ -196,6 +229,12 @@ export default async function StatisticPage({ params: { lang } }) {
                   </td>
                 </tr>
                 <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
+                  <td className="py-1">
+                    <ExplainPopOver
+                      title="UnLock"
+                      content="All unclaimed Pi after unlock"
+                    />
+                  </td>
                   <td className="  py-2 font-medium">UnLock</td>
                   <td className=" px-3 py-2 text-xs">
                     {Number.parseFloat(dataobj.unlocknotclaimed).toLocaleString(
@@ -206,8 +245,14 @@ export default async function StatisticPage({ params: { lang } }) {
                   </td>
                 </tr>
                 <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
+                  <td className="py-1">
+                    <ExplainPopOver
+                      title="Pioneer May Lose their Pi"
+                      content="All unclaimed Pi after 1 year unlock"
+                    />
+                  </td>
                   <td className="justify-center items-center  py-2 font-medium inline-flex select-all">
-                    MayLostPi <ToolTipMayLost />
+                    MayLostPi
                   </td>
                   <td className=" px-3 py-2 text-xs">
                     {Number.parseFloat(dataobj.oneyearunclaimed).toLocaleString(
@@ -221,7 +266,6 @@ export default async function StatisticPage({ params: { lang } }) {
             </table>
           </div>
         </div>
-
         <div className="w-full">
           <AccountCreation
             data={dataobj}
