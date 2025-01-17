@@ -262,6 +262,24 @@ export default async function StatisticPage({ params: { lang } }) {
                     Pi
                   </td>
                 </tr>
+                <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
+                  <td className="py-1">
+                    <ExplainPopOver
+                      title="Pioneer LockUp On Chain"
+                      content="The amount of Pi that lockup on chain (including claimant after unlock and claimed)"
+                    />
+                  </td>
+                  <td className="justify-center items-center  py-2 font-medium inline-flex select-all">
+                    OnChainLockup
+                  </td>
+                  <td className=" px-3 py-2 text-xs">
+                    {Number.parseFloat(dataobj.metric.OnchainLock).toLocaleString(
+                      "en-US",
+                      { maximumFractionDigits: 7 }
+                    )}{" "}
+                    Pi
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>

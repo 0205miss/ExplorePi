@@ -165,9 +165,13 @@ async function getlockupperiod() {
   docRef.update({ lockuptime: result });
 }
 async function getmetric() {
-  let result = await pool.query(
-    `SELECT a.a as TotalAccount,b.a as TotalPi,c.a as TotalClaim,b.a-c.a as TotalLock,d.a as TotalPioneer from(SELECT count(*) as a FROM explorepi.Account)as a,(SELECT sum(amount) as a FROM explorepi.claimant where status<>2 and ct_create=1) as b,(SELECT sum(amount) as a FROM explorepi.claimant where status=1 and ct_create=1)as c,(SELECT count(distinct account) as a FROM explorepi.claimant)as d`
-  );
+  let result = await pool.query(`SELECT a.a as TotalAccount,b.a+c.a as TotalPi,c.a as TotalClaim,b.a+f.a as TotalLock,d.a as TotalPioneer,e.a as OnchainLock from
+  (SELECT count(*) as a FROM explorepi.Account)as a
+  ,(SELECT sum(amount) as a FROM explorepi.claimant where status=0 and ct_create=1) as b
+  ,(SELECT sum(amount) as a FROM explorepi.claimant where status=1 and ct_create=1)as c
+  ,(SELECT count(distinct account) as a FROM explorepi.claimant)as d
+  ,(SELECT sum(amount) as a FROM explorepi.claimant where ct_create=0)as e
+  ,(SELECT sum(amount) as a FROM explorepi.claimant where status=0 and ct_create=0)as f;`);
   result = await JSON.parse(JSON.stringify(result));
   docRef.update({ metric: result[0] });
 }
@@ -192,6 +196,10 @@ async function getdailymetric() {
     `SELECT avg(spend) as a,sum(success) as b,sum(operation) as c,count(id) as d FROM explorepi.block where created_at >= now() - interval 24 hour`
   );
   avg_time = await JSON.parse(JSON.stringify(avg_time));
+  let account_create = await pool.query(
+      `SELECT count(*) as a FROM explorepi.Account where created_at >= now() - interval 24 hour`
+    );
+    account_create = await JSON.parse(JSON.stringify(account_create));
   let result = {
     active: active[0].dailyactive,
     fee: fee[0].a,
@@ -202,6 +210,7 @@ async function getdailymetric() {
     tps: avg_time[0].b,
     ops: avg_time[0].c,
     total_block: avg_time[0].d,
+    account_create:account_create[0].a
   };
   docRef.update({ daily: result });
 }
