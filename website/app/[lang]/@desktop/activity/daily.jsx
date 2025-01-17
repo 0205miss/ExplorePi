@@ -31,7 +31,7 @@ export default function DailyTable({ data }) {
           </TableRow>
           <TableRow key="2">
             <TableCell>Fee</TableCell>
-            <TableCell>{parseFloat(data.fee)}</TableCell>
+            <TableCell>{parseFloat(data.fee)} Pi</TableCell>
           </TableRow>
           <TableRow key="3">
             <TableCell>Operation</TableCell>
@@ -43,12 +43,12 @@ export default function DailyTable({ data }) {
           </TableRow>
           <TableRow key="5">
             <TableCell>Pay Volume</TableCell>
-            <TableCell>{data.payamount}</TableCell>
+            <TableCell>{data.payamount} Pi</TableCell>
           </TableRow>
           <TableRow key="6">
             <TableCell>AVG. Pay Volume</TableCell>
             <TableCell>
-              {parseFloat((parseFloat(data.payamount) / data.pay).toFixed(7))}
+              {parseFloat((parseFloat(data.payamount) / data.pay).toFixed(7))} Pi
             </TableCell>
           </TableRow>
           <TableRow key="7">

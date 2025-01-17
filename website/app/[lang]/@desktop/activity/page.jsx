@@ -5,6 +5,7 @@ import Top10 from './top10';
 import DailyTable from './daily';
 import RankTable from './rank';
 import TotalActive from './active';
+import OnChainLockUP from './claimant';
 export const revalidate =  1800
 
 
@@ -30,6 +31,7 @@ export default async function StatisticPage({params:{lang}}){
             <Top10 data={dataobj} lang={lang} transcript={transcript.statistic.TOP10}/>
             <RankTable data={dataobj.rank}/>
             <TotalActive data={activedataobj} transcript={transcript.statistic.Block}/>
+            <OnChainLockUP data={dataobj} transcript={transcript.statistic.Migrate}/>
         </div>        
         </>
     )
