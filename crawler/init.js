@@ -253,6 +253,31 @@ async function getPioneerLock() {
   result = await JSON.parse(JSON.stringify(result));
   docRef.set({ pioneerlock: result }, { merge: true });
 }
+/*
+ get lock period
+*/
+async function getonchainclaim(){
+  
+  let result = await pool.query(`SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y,sum(amount) as z FROM explorepi.claimant where claimed_at is not null and status=1 and ct_create=0 and created_at >= now() - interval 31 day group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`
+  )
+  result = await JSON.parse(JSON.stringify(result))
+  docRef.update({'OnChainclaimed':result})
+}
+async function getonchainclaimanthistory(){
+  let result = await pool.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,count(*) as y,sum(amount) as z FROM explorepi.claimant where created_at >= now() - interval 31 day and ct_create=0 group by DATE_FORMAT(created_at, '%Y-%m-%d') order by x asc;`)
+  result = await JSON.parse(JSON.stringify(result))
+  docRef.update({'OnChaincreateclaimant':result})
+}
+async function getonchainclaimedMonth(){
+  let result = await pool.query(`SELECT DATE_FORMAT(claimed_at, '%Y-%m') as x,count(*) as y,sum(amount) as z FROM explorepi.claimant where claimed_at is not null and status=1 and ct_create=0 group by DATE_FORMAT(claimed_at, '%Y-%m') order by x asc;`)
+  result = await JSON.parse(JSON.stringify(result))
+  docRef.update({'OnChainclaimedMonth':result})
+}
+async function getonchainclaimanthistoryMonth(){
+  let result = await pool.query(`SELECT DATE_FORMAT(created_at, '%Y-%m') as x,count(*) as y,sum(amount) as z FROM explorepi.claimant where ct_create=0 group by DATE_FORMAT(created_at, '%Y-%m') order by x asc;`)
+  result = await JSON.parse(JSON.stringify(result))
+  docRef.update({'OnChaincreateclaimantMonth':result})
+}
 
 async function init() {
   await getPioneerLock();
@@ -267,10 +292,13 @@ async function init() {
   await getclaimanthistoryMonth();
   await getclaimedMonthByCT();
   await getclaimanthistoryMonthByCT();
-
   await getblocktimeMonth();
   await getlockupperiod();
   await getmetric();
+  await getonchainclaim()
+  await getonchainclaimanthistory()
+  await getonchainclaimedMonth()
+  await getonchainclaimanthistoryMonth()
   await getunlocknotclaimed();
   await getavailablepi();
   await getfutureunlock();
@@ -279,6 +307,7 @@ async function init() {
   await getholderrank();
   await getactive();
   await getactiveMonth();
+  await getdailymetric()
   await getblock();
   await getblockMonth();
   docRef.set(

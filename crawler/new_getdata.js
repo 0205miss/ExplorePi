@@ -374,6 +374,69 @@ async function getPioneerLock() {
   docRef.update({'pioneerlock':result})
 }
 
+
+/* claim onchain data*/
+async function getonchainclaim() {
+  let result = await pool.query(
+    `SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y,sum(amount) as z FROM explorepi.claimant where claimed_at is not null and status=1 and ct_create=0 and created_at >= now() - interval 31 day group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`
+  );
+  result = await JSON.parse(JSON.stringify(result));
+  docRef.update({ OnChainclaimed: result });
+}
+
+async function getonchainclaimanthistory() {
+  let result = await pool.query(
+    `SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,count(*) as y,sum(amount) as z FROM explorepi.claimant where created_at >= now() - interval 31 day and ct_create=0 group by DATE_FORMAT(created_at, '%Y-%m-%d') order by x asc;`
+  );
+  result = await JSON.parse(JSON.stringify(result));
+  docRef.update({ OnChaincreateclaimant: result });
+}
+async function getonchainclaimedMonth(data) {
+  let final = data;
+  let result = await pool.query(
+    `SELECT DATE_FORMAT(claimed_at, '%Y-%m') as x,count(*) as y,sum(amount) as z FROM explorepi.claimant where claimed_at is not null and ct_create=0 and status=1 and claimed_at >= now() - interval 2 month group by DATE_FORMAT(claimed_at, '%Y-%m') order by x asc;`
+  );
+  const result_length = result.length;
+  result = await JSON.parse(JSON.stringify(result));
+  let check = 0;
+  data.forEach((i, index_i) => {
+    Object.values(result).forEach((g, index_g) => {
+      if (g.x == i.x) {
+        final[index_i] = result[index_g];
+        check++;
+      }
+    });
+  });
+  if (check != result_length) {
+    final.shift();
+    final.push(result[result_length - 1]);
+  }
+  docRef.update({ OnChainclaimedMonth: final });
+}
+
+async function getonchainclaimanthistoryMonth(data) {
+  let final = data;
+  let result = await pool.query(
+    `SELECT DATE_FORMAT(created_at, '%Y-%m') as x,count(*) as y,sum(amount) as z FROM explorepi.claimant where created_at >= now() - interval 2 month and ct_create=0 group by DATE_FORMAT(created_at, '%Y-%m') order by x asc;`
+  );
+  result = await JSON.parse(JSON.stringify(result));
+  const result_length = result.length;
+  let check = 0;
+  data.forEach((i, index_i) => {
+    Object.values(result).forEach((g, index_g) => {
+      if (g.x == i.x) {
+        final[index_i] = result[index_g];
+        check++;
+      }
+    });
+  });
+  if (check != result_length) {
+    final.shift();
+    final.push(result[result_length - 1]);
+  }
+  docRef.update({ OnChaincreateclaimantMonth: final });
+}
+
 async function statistic() {
   const get_temp = await docRef.get();
   const temp_doc = get_temp.data();
@@ -413,6 +476,10 @@ async function statistic() {
   await updateactiveMonth(active_temp_doc.accountMonth); //init
   await getblock(); //init
   await updateblockMonth(net_temp_doc.blockMonth); //init
+  await getonchainclaim(temp_doc.OnChainclaimed)
+  await getonchainclaimanthistory(temp_doc.OnChaincreateclaimant)
+  await getonchainclaimedMonth(temp_doc.OnChainclaimedMonth)
+  await getonchainclaimanthistoryMonth(temp_doc.OnChaincreateclaimantMonth)
   docRef.update({
     timestamp: Date.now(),
   });

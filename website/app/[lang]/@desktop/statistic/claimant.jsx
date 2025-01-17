@@ -55,14 +55,14 @@ export default function Claimant({data,transcript}){
                 datasets: [
                   {
                     label: transcript.Unlock,
-                    data: data.claimedMonth,
+                    data: data.claimedMonthByCT,
                     borderColor: 'rgb(255, 99, 132)',
                     backgroundColor: 'rgba(255, 99, 132, 0.5)',
                     yAxisID: 'y1',
                   },
                   {
                     label: transcript.Migrateop,
-                    data: data.createclaimantMonth,
+                    data: data.createclaimantMonthByCT,
                     borderColor: 'rgb(53, 162, 235)',
                     backgroundColor: 'rgba(53, 162, 235, 0.5)',
                     yAxisID: 'y',
@@ -189,14 +189,14 @@ export default function Claimant({data,transcript}){
                 datasets: [
                   {
                     label: transcript.Unlock,
-                    data: data.claimedMonth,
+                    data: data.claimedMonthByCT,
                     borderColor: 'rgb(255, 99, 132)',
                     backgroundColor: 'rgba(255, 99, 132, 0.5)',
                     yAxisID: 'y1',
                   },
                   {
                     label: transcript.lock,
-                    data: data.createclaimantMonth,
+                    data: data.createclaimantMonthByCT,
                     borderColor: 'rgb(53, 162, 235)',
                     backgroundColor: 'rgba(53, 162, 235, 0.5)',
                     yAxisID: 'y',

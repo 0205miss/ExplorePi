@@ -51,6 +51,12 @@ export default function DailyTable({ data }) {
               {parseFloat((parseFloat(data.payamount) / data.pay).toFixed(7))}
             </TableCell>
           </TableRow>
+          <TableRow key="7">
+            <TableCell>Account Create</TableCell>
+            <TableCell>
+              {data.account_create}
+            </TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </>
