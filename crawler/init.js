@@ -52,23 +52,24 @@ async function getopdistribute() {
   );
   docRef.set({ opdistribute: result }, { merge: true });
 }
+/*claimant*/
 async function getclaimed() {
   let result = await pool.query(
-    `SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=1 and created_at >= now() - interval 31 day group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`
+    `SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=1 and ct_create=1 and created_at >= now() - interval 31 day group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`
   );
   result = await JSON.parse(JSON.stringify(result));
   docRef.set({ claimed: result }, { merge: true });
 }
 async function getclaimedback() {
   let result = await pool.query(
-    `SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=2 and created_at >= now() - interval 31 day group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`
+    `SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=2 and ct_create=1 and created_at >= now() - interval 31 day group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`
   );
   result = await JSON.parse(JSON.stringify(result));
   docRef.set({ claimedback: result }, { merge: true });
 }
 async function getclaimanthistory() {
   let result = await pool.query(
-    `SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where created_at >= now() - interval 31 day group by DATE_FORMAT(created_at, '%Y-%m-%d') order by x asc;`
+    `SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where created_at >= now() - interval 31 day and ct_create=1 group by DATE_FORMAT(created_at, '%Y-%m-%d') order by x asc;`
   );
   result = await JSON.parse(JSON.stringify(result));
   docRef.set({ createclaimant: result }, { merge: true });
@@ -82,7 +83,7 @@ async function getclaimedMonth() {
 }
 async function getclaimedbackMonth() {
   let result = await pool.query(
-    `SELECT DATE_FORMAT(claimed_at, '%Y-%m') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=2 group by DATE_FORMAT(claimed_at, '%Y-%m') order by x asc;`
+    `SELECT DATE_FORMAT(claimed_at, '%Y-%m') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=2 and ct_create=1 group by DATE_FORMAT(claimed_at, '%Y-%m') order by x asc;`
   );
   result = await JSON.parse(JSON.stringify(result));
   docRef.set({ claimedbackMonth: result }, { merge: true });
@@ -94,6 +95,21 @@ async function getclaimanthistoryMonth() {
   result = await JSON.parse(JSON.stringify(result));
   docRef.set({ createclaimantMonth: result }, { merge: true });
 }
+async function getclaimedMonthByCT() {
+  let result = await pool.query(
+    `SELECT DATE_FORMAT(claimed_at, '%Y-%m') as x,count(*) as y,sum(amount) as z FROM explorepi.claimant where claimed_at is not null and ct_create=1 and status=1 group by DATE_FORMAT(claimed_at, '%Y-%m') order by x asc;`
+  );
+  result = await JSON.parse(JSON.stringify(result));
+  docRef.set({ claimedMonthByCT: result }, { merge: true });
+}
+async function getclaimanthistoryMonthByCT() {
+  let result = await pool.query(
+    `SELECT DATE_FORMAT(created_at, '%Y-%m') as x,count(*) as y,sum(amount) as z FROM explorepi.claimant where ct_create=1 group by DATE_FORMAT(created_at, '%Y-%m') order by x asc;`
+  );
+  result = await JSON.parse(JSON.stringify(result));
+  docRef.set({ createclaimantMonthByCT: result }, { merge: true });
+}
+  /**/
 
 async function getlockupperiod() {
   let result = await pool.query(
@@ -249,6 +265,9 @@ async function init() {
   await getclaimedMonth();
   await getclaimedbackMonth();
   await getclaimanthistoryMonth();
+  await getclaimedMonthByCT();
+  await getclaimanthistoryMonthByCT();
+
   await getblocktimeMonth();
   await getlockupperiod();
   await getmetric();

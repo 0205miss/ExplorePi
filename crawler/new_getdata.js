@@ -71,21 +71,21 @@ async function getopdistribute() {
 }
 async function getclaimed() {
   let result = await pool.query(
-    `SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=1 and created_at >= now() - interval 31 day group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`
+    `SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=1 and ct_create=1 and created_at >= now() - interval 31 day group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`
   );
   result = await JSON.parse(JSON.stringify(result));
   docRef.update({ claimed: result });
 }
 async function getclaimedback() {
   let result = await pool.query(
-    `SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=2 and created_at >= now() - interval 31 day group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`
+    `SELECT DATE_FORMAT(claimed_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=2 and ct_create=1 and created_at >= now() - interval 31 day group by DATE_FORMAT(claimed_at, '%Y-%m-%d') order by x asc;`
   );
   result = await JSON.parse(JSON.stringify(result));
   docRef.update({ claimedback: result });
 }
 async function getclaimanthistory() {
   let result = await pool.query(
-    `SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where created_at >= now() - interval 31 day group by DATE_FORMAT(created_at, '%Y-%m-%d') order by x asc;`
+    `SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as x,count(*) as y FROM explorepi.claimant where created_at >= now() - interval 31 day and ct_create=1 group by DATE_FORMAT(created_at, '%Y-%m-%d') order by x asc;`
   );
   result = await JSON.parse(JSON.stringify(result));
   docRef.update({ createclaimant: result });
@@ -115,7 +115,7 @@ async function getclaimedMonth(data) {
 async function getclaimedbackMonth(data) {
   let final = data;
   let result = await pool.query(
-    `SELECT DATE_FORMAT(claimed_at, '%Y-%m') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=2 and claimed_at >= now() - interval 2 month group by DATE_FORMAT(claimed_at, '%Y-%m') order by x asc;`
+    `SELECT DATE_FORMAT(claimed_at, '%Y-%m') as x,count(*) as y FROM explorepi.claimant where claimed_at is not null and status=2 and ct_create=1 and claimed_at >= now() - interval 2 month group by DATE_FORMAT(claimed_at, '%Y-%m') order by x asc;`
   );
   result = await JSON.parse(JSON.stringify(result));
   const result_length = result.length;
@@ -155,6 +155,51 @@ async function getclaimanthistoryMonth(data) {
     final.push(result[result_length - 1]);
   }
   docRef.update({ createclaimantMonth: final });
+}
+async function getclaimedMonthByCT(data) {
+  let final = data;
+  let result = await pool.query(
+    `SELECT DATE_FORMAT(claimed_at, '%Y-%m') as x,count(*) as y,sum(amount) as z FROM explorepi.claimant where claimed_at is not null and status=1 and ct_create=1 and claimed_at >= now() - interval 2 month group by DATE_FORMAT(claimed_at, '%Y-%m') order by x asc;`
+  );
+  const result_length = result.length;
+  result = await JSON.parse(JSON.stringify(result));
+  let check = 0;
+  data.forEach((i, index_i) => {
+    Object.values(result).forEach((g, index_g) => {
+      if (g.x == i.x) {
+        final[index_i] = result[index_g];
+        check++;
+      }
+    });
+  });
+  if (check != result_length) {
+    final.shift();
+    final.push(result[result_length - 1]);
+  }
+  docRef.update({ claimedMonthByCT: final });
+}
+
+async function getclaimanthistoryMonthByCT(data) {
+  let final = data;
+  let result = await pool.query(
+    `SELECT DATE_FORMAT(created_at, '%Y-%m') as x,count(*) as y,sum(amount) as z FROM explorepi.claimant where created_at >= now() - interval 2 month and ct_create=1 group by DATE_FORMAT(created_at, '%Y-%m') order by x asc;`
+  );
+  result = await JSON.parse(JSON.stringify(result));
+  const result_length = result.length;
+  let check = 0;
+  data.forEach((i, index_i) => {
+    Object.values(result).forEach((g, index_g) => {
+      if (g.x == i.x) {
+        final[index_i] = result[index_g];
+        check++;
+      }
+    });
+  });
+  if (check != result_length) {
+    final.shift();
+    final.push(result[result_length - 1]);
+  }
+  docRef.update({ createclaimantMonthByCT: final });
 }
 
 async function getlockupperiod() {
@@ -352,6 +397,9 @@ async function statistic() {
   await getclaimedMonth(temp_doc.claimedMonth); //init
   await getclaimedbackMonth(temp_doc.claimedbackMonth); //init
   await getclaimanthistoryMonth(temp_doc.createclaimantMonth); //init
+  await getclaimedMonthByCT(temp_doc.claimedMonthByCT); //init
+  await getclaimanthistoryMonthByCT(temp_doc.createclaimantMonthByCT); //init
+
   await getlockupperiod(); //init
   await getmetric();
   await getdailymetric();  
