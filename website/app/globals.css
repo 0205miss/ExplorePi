@@ -79,3 +79,7 @@ a {
     --radius: 0.5rem;
   }
 }
+
+[role=dialog] {
+  max-width: calc(100vw - 100px);
+}
