@@ -99,17 +99,29 @@ function claimable_balance_create_sql(res){
     )
 }
 function claimant_create_sql(res){
-    let lock_time = parseInt(res.predicate.not.rel_before)
-    let date = new Date(res.created_at)
-    let unlock_time = date.getSeconds() + lock_time
-    date.setSeconds(unlock_time)
-    unlock_time = date.toISOString().slice(0, 19).replace('T', ' ')
-    let sql = "INSERT INTO claimant(id,account,lock_time,unlock_time) VALUES ('"+res.balance_id+"','"+res.account+"',"+lock_time+",'"+unlock_time+"') ON DUPLICATE KEY UPDATE account=VALUES(account),lock_time=VALUES(lock_time),unlock_time=VALUES(unlock_time)"
-    let string = res.paging_token + ' effect finished'
-    worker+=1
-    pool.ex_sql(sql,string).then(
-        worker-=1
-    )
+    if( res?.predicate?.not?.rel_before != undefined|| res?.predicate?.and[0]?.not?.rel_before != undefined || res?.predicate?.and[1]?.not?.rel_before != undefined){
+        let lock_time
+        if(res?.predicate?.not?.rel_before != undefined){
+            lock_time = parseInt(res?.predicate?.not?.rel_before)
+        }else if(res?.predicate?.and[0]?.not?.rel_before != undefined){
+            lock_time = parseInt(res.predicate.and[0].not.rel_before)
+        }else if(res?.predicate?.and[1]?.not?.rel_before != undefined){
+            lock_time = parseInt(res.predicate.and[1].not.rel_before)
+        }
+        
+        let date = new Date(res.created_at)
+        let unlock_time = date.getSeconds() + lock_time
+        date.setSeconds(unlock_time)
+        unlock_time = date.toISOString().slice(0, 19).replace('T', ' ')
+        let sql = "INSERT INTO claimant(id,account,lock_time,unlock_time) VALUES ('"+res.balance_id+"','"+res.account+"',"+lock_time+",'"+unlock_time+"') ON DUPLICATE KEY UPDATE account=VALUES(account),lock_time=VALUES(lock_time),unlock_time=VALUES(unlock_time)"
+        let string = res.paging_token + ' effect finished'
+        worker+=1
+        pool.ex_sql(sql,string).then(
+            worker-=1
+        )
+    }else if(res.predicate.not.rel_before != undefined){
+
+    } 
 }
 function claim_claimant(res){
     let sql;

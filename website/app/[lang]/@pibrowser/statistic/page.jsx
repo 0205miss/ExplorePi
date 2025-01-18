@@ -7,6 +7,11 @@ import Claimant from "./claimant";
 import { translate } from "translate-config";
 import LockTime from "./locktime";
 import { Roboto_Mono } from "next/font/google";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@radix-ui/react-tabs";
+import NetworkPage from "./network/page";
+import DailyPage from "./daily/page";
+import MigrationPage from "./migration/page";
 export const revalidate = 3600;
 
 const roboto_Mono = Roboto_Mono({
@@ -23,41 +28,11 @@ export default async function StatisticPage({ params: { lang } }) {
   const db = admin.firestore();
   const data = await db.collection("statistic").doc("data").get();
   let dataobj = data.data();
-  /*block data*/
-  dataobj.blocktime.map((data) => {
-    if (data.y > 10) data.y = null;
-    data.x = new Date(data.x).getTime();
-  });
-  dataobj.blocktimeMonth.map((data) => {
-    if (data.y > 10) data.y = null;
-    data.x = new Date(data.x).getTime();
-  });
-  dataobj.claimedMonth.map((data) => {
-    data.x = new Date(data.x).getTime();
-  });
-  dataobj.claimedbackMonth.map((data) => {
-    data.x = new Date(data.x).getTime();
-  });
-  dataobj.createclaimantMonth.map((data) => {
-    data.x = new Date(data.x).getTime();
-  });
-  dataobj.claimed.map((data) => {
-    data.x = new Date(data.x).getTime();
-  });
-  dataobj.claimedback.map((data) => {
-    data.x = new Date(data.x).getTime();
-  });
-  dataobj.createclaimant.map((data) => {
-    data.x = new Date(data.x).getTime();
-  });
+  const net_data = await db.collection("statistic").doc("network").get();
+  let net_dataobj = net_data.data();
+  const activedata = await db.collection('statistic').doc('active').get()
+    let activedataobj = activedata.data()
   const update = new Date(dataobj.timestamp);
-  const totalpioneer = Number.parseInt(
-    dataobj.lockuptime[0].no_lock +
-      dataobj.lockuptime[0].oneyear +
-      dataobj.lockuptime[0].sixmonths +
-      dataobj.lockuptime[0].threeyear +
-      dataobj.lockuptime[0].twoweek
-  ).toLocaleString("en-US");
   return (
     <>
       <div className="mx-4 h-stream mt-2 overflow-y-scroll ">
@@ -66,99 +41,36 @@ export default async function StatisticPage({ params: { lang } }) {
           {update.toISOString().substr(0, 16).replace("T", " ")}
         </h2>
 
-        <div className={roboto_Mono.className + " w-full"}>
-          <div className="text-center mb-2 font-bold text-lg bg-border bg-border-size bg-no-repeat bg-left-bottom">
-            {transcript.statistic.Metrics.title}
-          </div>
-          <div className=" rounded-md overflow-hidden shadow-lg mb-4">
-            <table className="w-full text-center table-fixed">
-              <tbody>
-                <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
-                  <td className=" py-2 font-medium">
-                    {transcript.statistic.Metrics.TotalAccount}
-                  </td>
-                  <td className=" px-3 py-2">
-                    {Number.parseInt(
-                      dataobj.metric.TotalAccount
-                    ).toLocaleString("en-US")}
-                  </td>
-                </tr>
-                <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
-                  <td className=" py-2 font-medium">
-                    {transcript.statistic.Metrics.TotalPioneer}
-                  </td>
-                  <td className=" px-3 py-2">{totalpioneer}</td>
-                </tr>
-                <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
-                  <td className="  py-2 font-medium">
-                    {transcript.statistic.Metrics.MigratedPi}
-                  </td>
-                  <td className=" px-3 py-2 text-xs">
-                    {Number.parseFloat(dataobj.metric.TotalPi).toLocaleString(
-                      "en-US",
-                      { maximumFractionDigits: 7 }
-                    )}{" "}
-                    Pi
-                  </td>
-                </tr>
-                <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
-                  <td className="  py-2 font-medium">
-                    {transcript.statistic.Metrics.PioneerHold}
-                  </td>
-                  <td className=" px-3 py-2 text-xs">
-                    {Number.parseFloat(
-                      dataobj.metric.TotalClaim
-                    ).toLocaleString("en-US", {
-                      maximumFractionDigits: 7,
-                    })}{" "}
-                    Pi
-                  </td>
-                </tr>
-                <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
-                  <td className="  py-2 font-medium">
-                    {transcript.statistic.Metrics.PiLocked}
-                  </td>
-                  <td className=" px-3 py-2 text-xs">
-                    {Number.parseFloat(dataobj.metric.TotalLock).toLocaleString(
-                      "en-US",
-                      { maximumFractionDigits: 7 }
-                    )}{" "}
-                    Pi
-                  </td>
-                </tr>
-                <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
-                  <td className="justify-center items-center  py-2 font-medium inline-flex select-all">
-                    OnChainLockup
-                  </td>
-                  <td className=" px-3 py-2 text-xs">
-                    {Number.parseFloat(
-                      dataobj.metric.OnchainLock
-                    ).toLocaleString("en-US", {
-                      maximumFractionDigits: 7,
-                    })}{" "}
-                    Pi
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <Top10
-          data={dataobj}
-          lang={lang}
-          transcript={transcript.statistic.TOP10}
-        />
-
-        <div className="w-full">
-          <Claimant data={dataobj} transcript={transcript.statistic.Migrate} />
-        </div>
-        <div className="w-full">
-          <Block data={dataobj} transcript={transcript.statistic.Block} />
-        </div>
-        <div className="w-full">
-          <LockTime data={dataobj} transcript={transcript.statistic.LockUP} />
-        </div>
+        <Tabs  defaultValue="daily">
+          <TabsList className="w-full bg-slate-300 mt-2">
+            <TabsTrigger
+              className="data-[state=active]:bg-white"
+              value="network"
+            >
+              Network
+            </TabsTrigger>
+            <TabsTrigger className="data-[state=active]:bg-white" value="daily">
+              Daily
+            </TabsTrigger>
+            <TabsTrigger
+              className="data-[state=active]:bg-white"
+              value="migration"
+            >
+              Migration
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="network">
+            <div className="w-full">
+              <NetworkPage dataobj={dataobj} net_dataobj={net_dataobj} transcript={transcript}/>
+            </div>
+          </TabsContent>
+          <TabsContent value="daily">
+            <DailyPage dataobj={dataobj} activedataobj={activedataobj} transcript={transcript} lang={lang}></DailyPage>
+          </TabsContent>
+          <TabsContent value="migration">
+            <MigrationPage dataobj={dataobj}  transcript={transcript}/>
+          </TabsContent>
+        </Tabs>
       </div>
     </>
   );
