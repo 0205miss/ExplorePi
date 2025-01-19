@@ -211,8 +211,8 @@ export default async function StatisticPage({ params: { lang } }) {
                 <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
                   <td className="py-1">
                     <ExplainPopOver
-                      title="UnLock"
-                      content="All unclaimed Pi after unlock"
+                      title="Lock"
+                      content="All lock Pi on Chain"
                     />
                   </td>
                   <td className="  py-2 font-medium">
@@ -273,10 +273,11 @@ export default async function StatisticPage({ params: { lang } }) {
                     OnChainLockup
                   </td>
                   <td className=" px-3 py-2 text-xs">
-                    {Number.parseFloat(dataobj.metric.OnchainLock).toLocaleString(
-                      "en-US",
-                      { maximumFractionDigits: 7 }
-                    )}{" "}
+                    {Number.parseFloat(
+                      dataobj.metric.OnchainLock
+                    ).toLocaleString("en-US", {
+                      maximumFractionDigits: 7,
+                    })}{" "}
                     Pi
                   </td>
                 </tr>

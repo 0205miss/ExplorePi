@@ -197,8 +197,8 @@ export default async function MigrationPage({ dataobj, transcript }) {
               <tr className="border-b border-[#F7E4BE] bg-[#FBF2DE] text-neutral-800">
                 <td className="py-1">
                   <ExplainPopOver
-                    title="UnLock"
-                    content="All unclaimed Pi after unlock"
+                    title="Lock"
+                    content="All lock Pi on Chain"
                   />
                 </td>
                 <td className="  py-2 font-medium">
