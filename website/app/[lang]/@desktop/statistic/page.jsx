@@ -10,6 +10,7 @@ import AccountCreation from "./accountCreation";
 import Circulation from "./circulation";
 import ExplainPopOver from "components/ui/explain-pop";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import { unstable_cache } from "next/cache";
 //export const revalidate = 1800;
 
 const roboto_Mono = Roboto_Mono({
@@ -21,12 +22,23 @@ export async function generateStaticParams() {
   return translate.locales.map((locale) => ({ lang: locale }));
 }
 
-export default async function StatisticPage({ params: { lang } }) {
-  const transcript = await import(`locales/${lang}.json`);
+const getdata = async () => {
   const db = admin.firestore();
   const data = await db.collection("statistic").doc("data").get();
+  const dataobj = data.data()
+  return { dataobj };
+};
+
+const getdataImp = unstable_cache(getdata, ["getdata"], {
+  tags: ["getdata"],
+  revalidate: 60 * 10,
+});
+
+export default async function StatisticPage({ params: { lang } }) {
+  const transcript = await import(`locales/${lang}.json`);
+  const data = await getdataImp();
   const now = new Date();
-  let dataobj = data.data();
+  let dataobj = data.dataobj;
   //circulation
   let month_start = new Date(2022, 5, 5);
   let result_array = [];

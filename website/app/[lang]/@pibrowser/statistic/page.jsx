@@ -12,6 +12,7 @@ import { TabsContent } from "@radix-ui/react-tabs";
 import NetworkPage from "./network/page";
 import DailyPage from "./daily/page";
 import MigrationPage from "./migration/page";
+import { unstable_cache } from "next/cache";
 export const revalidate = 3600;
 
 const roboto_Mono = Roboto_Mono({
@@ -23,15 +24,48 @@ export async function generateStaticParams() {
   return translate.locales.map((locale) => ({ lang: locale }));
 }
 
-export default async function StatisticPage({ params: { lang } }) {
-  const transcript = await import(`locales/${lang}.json`);
+const getdata = async () => {
   const db = admin.firestore();
   const data = await db.collection("statistic").doc("data").get();
-  let dataobj = data.data();
-  const net_data = await db.collection("statistic").doc("network").get();
-  let net_dataobj = net_data.data();
-  const activedata = await db.collection('statistic').doc('active').get()
-    let activedataobj = activedata.data()
+  const dataobj = data.data()
+  return { dataobj };
+};
+
+const getdataImp = unstable_cache(getdata, ["getdata"], {
+  tags: ["getdata"],
+  revalidate: 60 * 10,
+});
+
+const getnetdata = async () => {
+  const db = admin.firestore();
+  const data = await db.collection("statistic").doc("network").get();
+  const dataobj = data.data();
+  return { dataobj };
+};
+const getnetdataImp = unstable_cache(getnetdata, ["getnetdata"], {
+  tags: ["getnetdata"],
+  revalidate: 60 * 10,
+});
+
+const getactivedata = async () => {
+  const db = admin.firestore();
+  const data = await db.collection("statistic").doc("active").get();
+  const dataobj = data.data()
+  return { dataobj };
+};
+const getactivedataImp = unstable_cache(getactivedata, ["getactivedata"], {
+    tags: ["getactivedata"],
+    revalidate: 60 * 10,
+  });
+
+export default async function StatisticPage({ params: { lang } }) {
+  const transcript = await import(`locales/${lang}.json`);
+  const data = await getdataImp();
+  let dataobj = data.dataobj;
+  const net_data = await getnetdataImp();
+  let net_dataobj = net_data.dataobj
+  const activedata = await getactivedataImp();
+  let activedataobj = activedata.dataobj;
   const update = new Date(dataobj.timestamp);
   return (
     <>
