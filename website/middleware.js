@@ -28,11 +28,11 @@ export function middleware(req){
 
     if (checkismissing) {
         let locale = getLocale(req)
-        return NextResponse.redirect(new URL(`/${locale}`+`${path}`, req.url))        
+        return NextResponse.redirect(new URL(`/${locale}`+`${path}`, req.url))      
       }
 }
 export const config = {
   matcher: [
-    '/((?!api|robots.txt|ads.txt|_next/static|$|_next/image|login|favicon.ico|newfavicon.ico|.well-known|app-ads.txt|policy.html|en|zh-TW|zh-CN).*)',
+    '/((?!api|robots.txt|ads.txt|manifest.webmanifest|site.webmanifest|_next/static|$|_next/image|login|favicon.ico|newfavicon.ico|.well-known|app-ads.txt|policy.html|icon-192x192.png|icon-512x512.png|apple-touch-icon.png|en|zh-TW|zh-CN).*)',
   ],
 }

@@ -9,51 +9,75 @@ export default function BlockChainData({ data, transcript }) {
       data.lockuptime[0].twoweek
   ).toLocaleString("en-US");
   return (
-    <Card>
+    <div className="grid gap-6 md:grid-cols-2">
+      <Card>
+        <CardHeader>Migration Statistic</CardHeader>
+        <CardBody>
+            <table className="table-fixed w-full">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{transcript.Metrics.TotalAccount}</td>
+                  <td>
+                    {Number.parseInt(data.metric.TotalAccount).toLocaleString(
+                      "en-US"
+                    )}
+                  </td>
+                </tr>
+                <tr>
+                  <td>{transcript.Metrics.TotalPioneer}</td>
+                  <td>{totalpioneer}</td>
+                </tr>
+                <tr>
+                  <td>{transcript.Metrics.MigratedPi}</td>
+                  <td>
+                    {Number.parseFloat(data.metric.TotalPi).toLocaleString(
+                      "en-US",
+                      {
+                        maximumFractionDigits: 7,
+                      }
+                    )}{" "}
+                    Pi
+                  </td>
+                </tr>
+                <tr>
+                  <td>Lock Pi on Chain</td>
+                  <td>
+                    {Number.parseFloat(data.metric.OnchainLock).toLocaleString(
+                      "en-US",
+                      {
+                        maximumFractionDigits: 7,
+                      }
+                    )}{" "}
+                    Pi
+                  </td>
+                </tr>
+                <tr>
+                  <td>Pioneer Hold</td>
+                  <td>
+                    {Number.parseFloat(data.metric.TotalClaim).toLocaleString(
+                      "en-US",
+                      {
+                        maximumFractionDigits: 7,
+                      }
+                    )}{" "}
+                    Pi
+                  </td>
+                </tr>
+                
+              </tbody>
+            </table>
+        </CardBody>
+      </Card>
+      <Card>
       <CardHeader>24 hr Blockchain Statistic</CardHeader>
       <CardBody>
-        <div className="flex">
-          <table className="table-auto w-1/2">
-            <thead>
-              <tr>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{transcript.Metrics.TotalAccount}</td>
-                <td>
-                  {Number.parseInt(data.metric.TotalAccount).toLocaleString(
-                    "en-US"
-                  )}
-                </td>
-              </tr>
-              <tr>
-                <td>{transcript.Metrics.TotalPioneer}</td>
-                <td>{totalpioneer}</td>
-              </tr>
-              <tr>
-                <td>{transcript.Metrics.MigratedPi}</td>
-                <td>
-                  {Number.parseFloat(data.metric.TotalPi).toLocaleString(
-                    "en-US",
-                    {
-                      maximumFractionDigits: 7,
-                    }
-                  )}{" "}
-                  Pi
-                </td>
-              </tr>
-              <tr>
-                <td>Active Pioneer</td>
-                <td>
-                  {data.daily.active}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <table className="table-auto w-1/2">
+          <table className="table-fixed w-full">
             <thead>
               <tr>
                 <th></th>
@@ -94,8 +118,8 @@ export default function BlockChainData({ data, transcript }) {
               </tr>
             </tbody>
           </table>
-        </div>
       </CardBody>
     </Card>
+    </div>
   );
 }
