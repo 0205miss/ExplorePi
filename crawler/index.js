@@ -43,6 +43,7 @@ const start = async () => {
     if (results[0].count === 0) {
         console.log('init')
         await pool.query(first_sql,"first init")//init memo:should add in init
+        await pool.query("INSERT INTO metadata(effect_cursor,op_cursor,tx_cursor,pre_time,block_cursor) VALUES ('1','60129546240','60129546240','2020-12-31T22:47:31Z','8589934592')","first init")//init memo:should add in init
     }
      block.block()
      effect.crawl()

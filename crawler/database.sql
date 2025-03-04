@@ -61,3 +61,11 @@ CREATE TABLE `operation` (
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `metadata` (
+  `effect_cursor` varchar(56) DEFAULT '1',
+  `op_cursor` varchar(56) DEFAULT '60129546240',
+  `tx_cursor` varchar(56) DEFAULT '60129546240',
+  `pre_time` varchar(56) DEFAULT '2020-12-31T22:47:31Z',
+  `block_cursor` varchar(56) DEFAULT '8589934592'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

@@ -210,7 +210,8 @@ async function getlockupperiod() {
   docRef.update({ lockuptime: result });
 }
 async function getmetric() {
-  let result = await pool.query(`SELECT a.a as TotalAccount,b.a+c.a as TotalPi,c.a as TotalClaim,b.a+f.a as TotalLock,d.a as TotalPioneer,e.a as OnchainLock from
+  let result =
+    await pool.query(`SELECT a.a as TotalAccount,b.a+c.a as TotalPi,c.a as TotalClaim,b.a+f.a as TotalLock,d.a as TotalPioneer,e.a as OnchainLock from
   (SELECT count(*) as a FROM explorepi.Account)as a
   ,(SELECT sum(amount) as a FROM explorepi.claimant where status=0 and ct_create=1) as b
   ,(SELECT sum(amount) as a FROM explorepi.claimant where status=1 and ct_create=1)as c
@@ -242,9 +243,9 @@ async function getdailymetric() {
   );
   avg_time = await JSON.parse(JSON.stringify(avg_time));
   let account_create = await pool.query(
-      `SELECT count(*) as a FROM explorepi.Account where created_at >= now() - interval 24 hour`
-    );
-    account_create = await JSON.parse(JSON.stringify(account_create));
+    `SELECT count(*) as a FROM explorepi.Account where created_at >= now() - interval 24 hour`
+  );
+  account_create = await JSON.parse(JSON.stringify(account_create));
   let result = {
     active: active[0].dailyactive,
     fee: fee[0].a,
@@ -255,7 +256,7 @@ async function getdailymetric() {
     tps: avg_time[0].b,
     ops: avg_time[0].c,
     total_block: avg_time[0].d,
-    account_create:account_create[0].a
+    account_create: account_create[0].a,
   };
   docRef.update({ daily: result });
 }
@@ -363,17 +364,20 @@ async function updateblockMonth(data) {
 }
 
 async function getAccountCreation() {
-  let result = await pool.query(`SELECT DATE_FORMAT(created_at, '%Y-%m') as x,count(*)as y FROM explorepi.Account where Role = 'Pioneer' group by DATE_FORMAT(created_at, '%Y-%m') order by x;`)
-  result = await JSON.parse(JSON.stringify(result))
-  docRef.update({'accountCreation':result})
+  let result = await pool.query(
+    `SELECT DATE_FORMAT(created_at, '%Y-%m') as x,count(*)as y FROM explorepi.Account where Role = 'Pioneer' group by DATE_FORMAT(created_at, '%Y-%m') order by x;`
+  );
+  result = await JSON.parse(JSON.stringify(result));
+  docRef.update({ accountCreation: result });
 }
 
 async function getPioneerLock() {
-  let result = await pool.query(`SELECT DATE_FORMAT(created_at, '%Y-%m') as x,sum(amount) as y FROM explorepi.claimant where ct_create = 0 group by DATE_FORMAT(created_at, '%Y-%m') order by x asc;`)
-  result = await JSON.parse(JSON.stringify(result))
-  docRef.update({'pioneerlock':result})
+  let result = await pool.query(
+    `SELECT DATE_FORMAT(created_at, '%Y-%m') as x,sum(amount) as y FROM explorepi.claimant where ct_create = 0 group by DATE_FORMAT(created_at, '%Y-%m') order by x asc;`
+  );
+  result = await JSON.parse(JSON.stringify(result));
+  docRef.update({ pioneerlock: result });
 }
-
 
 /* claim onchain data*/
 async function getonchainclaim() {
@@ -444,65 +448,129 @@ async function statistic() {
   const active_temp_doc = get_active_temp.data();
   const get_net_temp = await netRef.get();
   const net_temp_doc = get_net_temp.data();
-  
-  await getPioneerLock()
-  await getAccountCreation()
+
+  console.time("getPioneerLock");
+  await getPioneerLock();
+  console.timeEnd("getPioneerLock");
+  console.time("getAccountCreation");
+  await getAccountCreation();
+  console.timeEnd("getAccountCreation");
+  console.time("getTop10");
   await getTop10();
+  console.timeEnd("getTop10");
+  console.time("getblocktime");
   await getblocktime();
+  console.timeEnd("getblocktime");
+  console.time("updateblocktimeMonth");
   await updateblocktimeMonth(temp_doc.blocktimeMonth); //init
+  console.timeEnd("updateblocktimeMonth");
+  console.time("getTop10payment");
   await getTop10payment();
+  console.timeEnd("getTop10payment");
+  console.time("getTop10fee");
   await getTop10fee();
+  console.timeEnd("getTop10fee");
+  console.time("getopdistribute");
   await getopdistribute();
+  console.timeEnd("getopdistribute");
+  console.time("getclaimed");
 
   await getclaimed(); //init
+  console.timeEnd("getclaimed");
+  console.time("getclaimedback");
   await getclaimedback(); //init
+  console.timeEnd("getclaimedback");
+  console.time("getclaimanthistory");
   await getclaimanthistory(); //init
+  console.timeEnd("getclaimanthistory");
+  console.time("getclaimedMonth");
   await getclaimedMonth(temp_doc.claimedMonth); //init
+  console.timeEnd("getclaimedMonth");
+  console.time("getclaimedbackMonth");
   await getclaimedbackMonth(temp_doc.claimedbackMonth); //init
+  console.timeEnd("getclaimedbackMonth");
+  console.time("getclaimanthistoryMonth");
   await getclaimanthistoryMonth(temp_doc.createclaimantMonth); //init
+  console.timeEnd("getclaimanthistoryMonth");
+  console.time("getclaimedMonthByCT");
   await getclaimedMonthByCT(temp_doc.claimedMonthByCT); //init
+  console.timeEnd("getclaimedMonthByCT");
+  console.time("getclaimanthistoryMonthByCT");
   await getclaimanthistoryMonthByCT(temp_doc.createclaimantMonthByCT); //init
+  console.timeEnd("getclaimanthistoryMonthByCT");
+  console.time("getlockupperiod");
 
   await getlockupperiod(); //init
+  console.timeEnd("getlockupperiod");
+  console.time("getmetric");
   await getmetric();
-  await getdailymetric();  
+  console.timeEnd("getmetric");
+  console.time("getdailymetric");
+  await getdailymetric();
+  console.timeEnd("getdailymetric");
+  console.time("getunlocknotclaimed");
   await getunlocknotclaimed();
+  console.timeEnd("getunlocknotclaimed");
+  console.time("getavailablepi");
   await getavailablepi();
+  console.timeEnd("getavailablepi");
+  console.time("getfutureunlock");
   await getfutureunlock();
+  console.timeEnd("getfutureunlock");
+  console.time("getfutureunlockMonth");
   await getfutureunlockMonth();
+  console.timeEnd("getfutureunlockMonth");
+  console.time("getoneyearunclaimed");
   await getoneyearunclaimed();
+  console.timeEnd("getoneyearunclaimed");
+  console.time("getholderrank");
   await getholderrank();
+  console.timeEnd("getholderrank");
+  console.time("getactive");
   await getactive(); //init
+  console.timeEnd("getactive");
+  console.time("updateactiveMonth");
   await updateactiveMonth(active_temp_doc.accountMonth); //init
+  console.timeEnd("updateactiveMonth");
+  console.time("getblock");
   await getblock(); //init
+  console.timeEnd("getblock");
+  console.time("updateblockMonth");
   await updateblockMonth(net_temp_doc.blockMonth); //init
-  await getonchainclaim(temp_doc.OnChainclaimed)
-  await getonchainclaimanthistory(temp_doc.OnChaincreateclaimant)
-  await getonchainclaimedMonth(temp_doc.OnChainclaimedMonth)
-  await getonchainclaimanthistoryMonth(temp_doc.OnChaincreateclaimantMonth)
+  console.timeEnd("updateblockMonth");
+  console.time("getonchainclaim");
+  await getonchainclaim(temp_doc.OnChainclaimed);
+  console.timeEnd("getonchainclaim");
+  console.time("getonchainclaimanthistory");
+  await getonchainclaimanthistory(temp_doc.OnChaincreateclaimant);
+  console.timeEnd("getonchainclaimanthistory");
+  console.time("getonchainclaimedMonth");
+  await getonchainclaimedMonth(temp_doc.OnChainclaimedMonth);
+  console.timeEnd("getonchainclaimedMonth");
+  console.time("getonchainclaimanthistoryMonth");
+  await getonchainclaimanthistoryMonth(temp_doc.OnChaincreateclaimantMonth);
+  console.timeEnd("getonchainclaimanthistoryMonth");
   docRef.update({
     timestamp: Date.now(),
   });
-  
 }
 
 const start = async () => {
   console.log("Getdata start");
   await init();
 
-    const job = schedule.scheduleJob('0 * * * *', function(){
-        statistic()
-    });
+  const job = schedule.scheduleJob("0 * * * *", function () {
+    statistic();
+  });
 
-    const rl = readline.createInterface({ input, output });
+  const rl = readline.createInterface({ input, output });
 
-    rl.question('Press q to exit\n', (answer) => {
-      // TODO: Log the answer in a database
-      if (answer === 'q'){
-        job.cancel();
-      }
-      rl.close();
-      
-    });
+  rl.question("Press q to exit\n", (answer) => {
+    // TODO: Log the answer in a database
+    if (answer === "q") {
+      job.cancel();
+    }
+    rl.close();
+  });
 };
-start();
+statistic();

@@ -1,212 +1,284 @@
-require('dotenv').config()
-const pool = require('./database')  
-const StellarSdk = require('stellar-sdk');
-const horizon = process.env['HORIZON_URL']
+require("dotenv").config();
+const pool = require("./database");
+const StellarSdk = require("stellar-sdk");
+const horizon = process.env["HORIZON_URL"];
 // @ts-ignore
 const server = new StellarSdk.Server(horizon);
-let lastCursor=process.env['EFFECT_CURSOR']; 
 
-let lastprocess
-let streamer,worker
+let lastprocess;
+let streamer, worker;
 
-async function crawl(){    
-    try{
-        worker = 0
-        streamer =server.effects()
-        // @ts-ignore
-        .cursor(lastCursor)
-        .stream({
-            onmessage: effectHandler
-        })
-        console.log('effect start')
-    }catch(e){
-        console.log(lastCursor)
-    }
-    return
+async function crawl() {
+  try {
+    let result = await pool.query(`SELECT * FROM explorepi.metadata;`);
+    result = await JSON.parse(JSON.stringify(result));
+    let lastCursor = result[0].effect_cursor;
+    worker = 0;
+    streamer = server
+      .effects()
+      // @ts-ignore
+      .cursor(lastCursor)
+      .stream({
+        onmessage: effectHandler,
+      });
+    console.log("effect start");
+  } catch (e) {
+    console.log(lastCursor);
+  }
+  return;
 }
 
+function credit_sql(res) {
+  let sql;
+  if (res.asset_type == "native") {
+    sql =
+      "UPDATE Account SET balance = balance + " +
+      res.amount +
+      " WHERE public_key = '" +
+      res.account +
+      "'";
+  } else {
+    sql =
+      "UPDATE asset SET balance = balance + " +
+      res.amount +
+      " WHERE public_key = '" +
+      res.account +
+      "' AND asset_code = '" +
+      res.asset_code +
+      "' AND asset_issuer = '" +
+      res.asset_issuer +
+      "'";
+  }
+  let string = res.paging_token + " effect finished";
+  worker += 1;
+  pool.ex_sql(sql, string).then((worker -= 1));
+}
+function debit_sql(res) {
+  let sql;
+  if (res.asset_type == "native") {
+    sql =
+      "UPDATE Account SET balance = balance - " +
+      res.amount +
+      " WHERE public_key = '" +
+      res.account +
+      "'";
+  } else {
+    sql =
+      "UPDATE asset SET balance = balance - " +
+      res.amount +
+      " WHERE public_key = '" +
+      res.account +
+      "' AND asset_code = '" +
+      res.asset_code +
+      "' AND asset_issuer = '" +
+      res.asset_issuer +
+      "'";
+  }
+  let string = res.paging_token + " effect finished";
+  worker += 1;
+  pool.ex_sql(sql, string).then((worker -= 1));
+}
+function removed_account(res) {
+  let sql = "DELETE FROM account WHERE public_key= '" + res.account + "'";
+  let string = res.paging_token + " effect finished";
+  worker += 1;
+  pool.ex_sql(sql, string).then((worker -= 1));
+}
+function lock_sql(res) {
+  let sql =
+    "UPDATE Account SET lock=1 WHERE public_key = '" + res.account + "'";
+  let string = res.paging_token + " effect finished";
+  worker += 1;
+  pool.ex_sql(sql, string).then((worker -= 1));
+}
+function trustline_create_sql(res) {
+  let date = res.created_at.slice(0, 19).replace("T", " ");
+  let sql =
+    "INSERT INTO asset(public_key,asset_code,asset_issuer,created_at) VALUES ('" +
+    res.account +
+    "','" +
+    res.asset_code +
+    "','" +
+    res.asset_issuer +
+    "','" +
+    date +
+    "')";
+  let string = res.paging_token + " effect finished";
+  worker += 1;
+  pool.ex_sql(sql, string).then((worker -= 1));
+}
+function trustline_remove_sql(res) {
+  let date = res.created_at.slice(0, 19).replace("T", " ");
+  let sql =
+    "UPDATE asset SET removed = 1 ,removed_at = '" +
+    date +
+    "' WHERE id = (SELECT MIN(id) FROM asset WHERE public_key = '" +
+    res.account +
+    "' AND asset_code = '" +
+    res.asset_code +
+    "' AND asset_issuer = '" +
+    res.asset_issuer +
+    "' AND removed = 0)";
+  let string = res.paging_token + " effect finished";
+  worker += 1;
+  pool.ex_sql(sql, string).then((worker -= 1));
+}
+function claimable_balance_create_sql(res) {
+  let date = res.created_at.slice(0, 19).replace("T", " ");
+  let sql =
+    "INSERT INTO claimant(id,created_at,amount) VALUES ('" +
+    res.balance_id +
+    "','" +
+    date +
+    "'," +
+    res.amount +
+    ") ON DUPLICATE KEY UPDATE created_at=VALUES(created_at),amount=VALUES(amount)";
+  if (
+    res.account != "GABT7EMPGNCQSZM22DIYC4FNKHUVJTXITUF6Y5HNIWPU4GA7BHT4GC5G"
+  ) {
+    sql =
+      "INSERT INTO claimant(id,created_at,amount,ct_create) VALUES ('" +
+      res.balance_id +
+      "','" +
+      date +
+      "'," +
+      res.amount +
+      ",0) ON DUPLICATE KEY UPDATE created_at=VALUES(created_at),amount=VALUES(amount),ct_create=VALUES(ct_create)";
+  }
+  let string = res.paging_token + " effect finished";
+  worker += 1;
+  pool.ex_sql(sql, string).then((worker -= 1));
+}
+function claimant_create_sql(res) {
+  if (
+    !res?.predicate?.not?.rel_before ||
+    !res?.predicate?.and?.[0]?.not?.rel_before ||
+    res?.predicate?.and?.[1]?.not?.rel_before
+  ) {
+    let lock_time = 0;
+    if (res?.predicate?.not?.rel_before != undefined) {
+      lock_time = parseInt(res?.predicate?.not?.rel_before);
+    } else if (res?.predicate?.and?.[0]?.not?.rel_before != undefined) {
+      lock_time = parseInt(res.predicate.and[0].not.rel_before);
+    } else if (res?.predicate?.and?.[1]?.not?.rel_before != undefined) {
+      lock_time = parseInt(res.predicate.and[1].not.rel_before);
+    }
+    console.log(res.id);
+    let date = new Date(res.created_at);
+    let unlock_time = date.getSeconds() + lock_time;
+    date.setSeconds(unlock_time);
 
-function credit_sql(res){
-    let sql
-    if(res.asset_type=='native'){
-        sql = "UPDATE Account SET balance = balance + " + res.amount +" WHERE public_key = '"+ res.account +"'"
-    }else{
-        sql = "UPDATE asset SET balance = balance + " + res.amount + " WHERE public_key = '"+ res.account +"' AND asset_code = '"+res.asset_code + "' AND asset_issuer = '"+res.asset_issuer +"'"
-    }
-    let string = res.paging_token + ' effect finished'
-    worker+=1
-    pool.ex_sql(sql,string).then(
-        worker-=1
-    )
+    unlock_time = date.toISOString().slice(0, 19).replace("T", " ");
+    let sql =
+      "INSERT INTO claimant(id,account,lock_time,unlock_time) VALUES ('" +
+      res.balance_id +
+      "','" +
+      res.account +
+      "'," +
+      lock_time +
+      ",'" +
+      unlock_time +
+      "') ON DUPLICATE KEY UPDATE account=VALUES(account),lock_time=VALUES(lock_time),unlock_time=VALUES(unlock_time)";
+    let string = res.paging_token + " effect finished";
+    worker += 1;
+    pool.ex_sql(sql, string).then((worker -= 1));
+  } else if (res.predicate.not.rel_before != undefined) {
+  }
 }
-function debit_sql(res){
-    let sql
-    if(res.asset_type=='native'){
-        sql = "UPDATE Account SET balance = balance - " + res.amount +" WHERE public_key = '"+ res.account +"'"
-    }else{
-        sql = "UPDATE asset SET balance = balance - " + res.amount + " WHERE public_key = '"+ res.account +"' AND asset_code = '"+res.asset_code + "' AND asset_issuer = '"+res.asset_issuer +"'"
-    }
-    let string = res.paging_token + ' effect finished'
-    worker+=1
-    pool.ex_sql(sql,string).then(
-        worker-=1
-    )
-}
-function removed_account(res){
-    let sql = "DELETE FROM account WHERE public_key= '"+ res.account +"'"
-    let string = res.paging_token + ' effect finished'
-    worker+=1
-    pool.ex_sql(sql,string).then(
-        worker-=1
-    )
-}
-function lock_sql(res){
-    let sql = "UPDATE Account SET lock=1 WHERE public_key = '"+ res.account +"'"
-    let string = res.paging_token + ' effect finished'
-    worker+=1
-    pool.ex_sql(sql,string).then(
-        worker-=1
-    )
-}
-function trustline_create_sql(res){
-    let date = res.created_at.slice(0, 19).replace('T', ' ')
-    let sql = "INSERT INTO asset(public_key,asset_code,asset_issuer,created_at) VALUES ('"+res.account+"','"+res.asset_code+"','"+res.asset_issuer+"','"+date+"')"
-    let string = res.paging_token + ' effect finished'
-    worker+=1
-    pool.ex_sql(sql,string).then(
-        worker-=1
-    )
-}
-function trustline_remove_sql(res){
-    let date = res.created_at.slice(0, 19).replace('T', ' ')
-    let sql = "UPDATE asset SET removed = 1 ,removed_at = '"+date+"' WHERE id = (SELECT MIN(id) FROM asset WHERE public_key = '"+res.account+"' AND asset_code = '"+res.asset_code+"' AND asset_issuer = '"+res.asset_issuer+"' AND removed = 0)"
-    let string = res.paging_token + ' effect finished'
-    worker+=1
-    pool.ex_sql(sql,string).then(
-        worker-=1
-    )
-}
-function claimable_balance_create_sql(res){
-    let date = res.created_at.slice(0, 19).replace('T', ' ')
-    let sql = "INSERT INTO claimant(id,created_at,amount) VALUES ('"+res.balance_id+"','"+date+"',"+res.amount+") ON DUPLICATE KEY UPDATE created_at=VALUES(created_at),amount=VALUES(amount)"
-    if(res.account!="GABT7EMPGNCQSZM22DIYC4FNKHUVJTXITUF6Y5HNIWPU4GA7BHT4GC5G"){
-        sql = "INSERT INTO claimant(id,created_at,amount,ct_create) VALUES ('"+res.balance_id+"','"+date+"',"+res.amount+",0) ON DUPLICATE KEY UPDATE created_at=VALUES(created_at),amount=VALUES(amount),ct_create=VALUES(ct_create)"
-    }
-    let string = res.paging_token + ' effect finished'
-    worker+=1
-    pool.ex_sql(sql,string).then(
-        worker-=1
-    )
-}
-function claimant_create_sql(res){
-    if( res?.predicate?.not?.rel_before != undefined|| res?.predicate?.and[0]?.not?.rel_before != undefined || res?.predicate?.and[1]?.not?.rel_before != undefined){
-        let lock_time
-        if(res?.predicate?.not?.rel_before != undefined){
-            lock_time = parseInt(res?.predicate?.not?.rel_before)
-        }else if(res?.predicate?.and[0]?.not?.rel_before != undefined){
-            lock_time = parseInt(res.predicate.and[0].not.rel_before)
-        }else if(res?.predicate?.and[1]?.not?.rel_before != undefined){
-            lock_time = parseInt(res.predicate.and[1].not.rel_before)
-        }
-        
-        let date = new Date(res.created_at)
-        let unlock_time = date.getSeconds() + lock_time
-        date.setSeconds(unlock_time)
-        unlock_time = date.toISOString().slice(0, 19).replace('T', ' ')
-        let sql = "INSERT INTO claimant(id,account,lock_time,unlock_time) VALUES ('"+res.balance_id+"','"+res.account+"',"+lock_time+",'"+unlock_time+"') ON DUPLICATE KEY UPDATE account=VALUES(account),lock_time=VALUES(lock_time),unlock_time=VALUES(unlock_time)"
-        let string = res.paging_token + ' effect finished'
-        worker+=1
-        pool.ex_sql(sql,string).then(
-            worker-=1
-        )
-    }else if(res.predicate.not.rel_before != undefined){
-
-    } 
-}
-function claim_claimant(res){
-    let sql;
-    let date = res.created_at.slice(0, 19).replace('T', ' ')
-    if(res.account === "GC5RNDCRO6DDM7NZDEMW3RIN5K6AHN6GMWSZ5SAH2TRJLVGQMB2I3BNJ"){
-        //STATUS 2 CT clawback
-        sql = "UPDATE claimant SET status = 2,claimed_at = '"+date+"' WHERE id='"+res.balance_id+"'"
-    }else{
-        sql = "UPDATE claimant SET status = 1,claimed_at = '"+date+"' WHERE id='"+res.balance_id+"'"
-    }
-    let string = res.paging_token + ' effect finished'
-    worker+=1
-    pool.ex_sql(sql,string).then(
-        worker-=1
-    )
+function claim_claimant(res) {
+  let sql;
+  let date = res.created_at.slice(0, 19).replace("T", " ");
+  if (
+    res.account === "GC5RNDCRO6DDM7NZDEMW3RIN5K6AHN6GMWSZ5SAH2TRJLVGQMB2I3BNJ"
+  ) {
+    //STATUS 2 CT clawback
+    sql =
+      "UPDATE claimant SET status = 2,claimed_at = '" +
+      date +
+      "' WHERE id='" +
+      res.balance_id +
+      "'";
+  } else {
+    sql =
+      "UPDATE claimant SET status = 1,claimed_at = '" +
+      date +
+      "' WHERE id='" +
+      res.balance_id +
+      "'";
+  }
+  let string = res.paging_token + " effect finished";
+  worker += 1;
+  pool.ex_sql(sql, string).then((worker -= 1));
 }
 
 const effectHandler = function (effResponse) {
-    
-    lastprocess=effResponse.paging_token
-    //console.log('Last : ' +lastprocess)
-    switch(effResponse.type_i){
-        case 0:
-            //account_created
-          break;
-        case 0:
-            removed_account(effResponse)
-            //account_removed
-          break;
-        case 2:
-            //account_credited
-            credit_sql(effResponse)
-            break;
-        case 3:
-            //account_debited
-            debit_sql(effResponse)
-            break;
-        case 11:
-            //signer_removed
-            if(effResponse.account === effResponse.public_key)
-                lock_sql(effResponse)
-            else
-                break
-            break
-        case 20:
-            //trustline_created
-            trustline_create_sql(effResponse)
-            break;
-        case 21:
-            //trustline_removed
-            trustline_remove_sql(effResponse)
-            break;
-        case 50:
-            //claimable_balance_created
-            claimable_balance_create_sql(effResponse)
-            break;
-        case 51:
-            //claimant_created
-            if(effResponse.account==="GC5RNDCRO6DDM7NZDEMW3RIN5K6AHN6GMWSZ5SAH2TRJLVGQMB2I3BNJ")
-            break;
-            claimant_create_sql(effResponse)
-            break;
-        case 52:
-            //claimable_balance_claimed
-            claim_claimant(effResponse)
-            break;
-        default:
-         break;
-    }
-
-}
+  lastprocess = effResponse.paging_token;
+  //console.log('Last : ' +lastprocess)
+  switch (effResponse.type_i) {
+    case 0:
+      //account_created
+      break;
+    case 1:
+      removed_account(effResponse);
+      //account_removed
+      break;
+    case 2:
+      //account_credited
+      credit_sql(effResponse);
+      break;
+    case 3:
+      //account_debited
+      debit_sql(effResponse);
+      break;
+    case 11:
+      //signer_removed
+      if (effResponse.account === effResponse.public_key) lock_sql(effResponse);
+      else break;
+      break;
+    case 20:
+      //trustline_created
+      trustline_create_sql(effResponse);
+      break;
+    case 21:
+      //trustline_removed
+      trustline_remove_sql(effResponse);
+      break;
+    case 50:
+      //claimable_balance_created
+      claimable_balance_create_sql(effResponse);
+      break;
+    case 51:
+      //claimant_created
+      if (
+        effResponse.account ===
+        "GC5RNDCRO6DDM7NZDEMW3RIN5K6AHN6GMWSZ5SAH2TRJLVGQMB2I3BNJ"
+      )
+        break;
+      claimant_create_sql(effResponse);
+      break;
+    case 52:
+      //claimable_balance_claimed
+      claim_claimant(effResponse);
+      break;
+    default:
+      break;
+  }
+  pool.ex_sql("UPDATE metadata SET effect_cursor = " + lastprocess);
+};
 
 function effectclose() {
-    return new Promise((resolve, reject) => {
-    if(worker == 0){
-        resolve(lastprocess);
-    }else{
-        console.log(worker)
-        setTimeout(effectclose,1000)
+  return new Promise((resolve, reject) => {
+    if (worker == 0) {
+      resolve(lastprocess);
+    } else {
+      console.log(worker);
+      setTimeout(effectclose, 1000);
     }
   });
 }
 
-function effectstreamclose(){
-    streamer();
+function effectstreamclose() {
+  streamer();
 }
 
-module.exports = {effectclose,effectstreamclose,crawl};
+module.exports = { effectclose, effectstreamclose, crawl };
