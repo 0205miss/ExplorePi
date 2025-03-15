@@ -94,6 +94,14 @@ export default function SideBar({ lang }) {
                 <FontAwesomeIcon icon={faUsers} />
                 <span className="ml-2">Activity</span>
               </ListboxItem>
+              <ListboxItem
+                key="node"
+                aria-label="node"
+                href={"/" + lang + "/node"}
+              >
+                <FontAwesomeIcon icon={faNetworkWired} />
+                <span className="ml-2">Node</span>
+              </ListboxItem>
             </Listbox>
           </section>
           <Divider />

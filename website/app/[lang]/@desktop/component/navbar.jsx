@@ -21,8 +21,8 @@ export default function NavbarMobile({ lang }) {
   const pathname = usePathname();
   const dataItems = ["Block", "Transaction", "Operation"];
   const datapath = ["block", "tx", "op"];
-  const statusItems = ["Network", "Migration", "Activity"];
-  const statuspath = ["network", "statistic", "activity"];
+  const statusItems = ["Network", "Migration", "Activity","Node"];
+  const statuspath = ["network", "statistic", "activity","node"];
   const menuItems = ["Developer", "Github", "Privacy"];
   const menupath = [
     "https://kaikai-beryl.vercel.app/",
